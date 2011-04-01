@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/Robos/!svn/ver/20/src/robos
+END
+Main.java
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/Robos/!svn/ver/20/src/robos/Main.java
+END
+Jogador.java
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/Robos/!svn/ver/15/src/robos/Jogador.java
+END
+RedeNeural.java
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/Robos/!svn/ver/19/src/robos/RedeNeural.java
+END
+Fuzzy.java
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/Robos/!svn/ver/12/src/robos/Fuzzy.java
+END
+MetodosAux.java
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/Robos/!svn/ver/20/src/robos/MetodosAux.java
+END
+MonitoraGol.java
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/Robos/!svn/ver/20/src/robos/MonitoraGol.java
+END

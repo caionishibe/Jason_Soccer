@@ -1,0 +1,23 @@
+# All dimensions are provided in IS units: m, kg, m/s, N, etc.
+ 
+# Field properties
+field.frictionCoheficient=20
+field.centerCircle.radius=0.5
+field.goalArea.radius=0.5
+field.border=0.3
+field.height=4.0
+field.width=5.5
+goal.size=0.7
+goal.depth=0.180
+
+# Ball properties
+ball.radius=0.025
+ball.mass=0.046
+
+# Robot properties
+robot.radius=0.090
+robot.mass=0.5
+# 30 Watts per motor
+robot.max.power=60
+robot.max.velocity=3.5
+robot.kicker.velocity.max=10

@@ -1,0 +1,98 @@
+//Definicao do bloco
+FUNCTION_BLOCK pos_chute
+
+// Define as variáveis de entrada
+VAR_INPUT
+    pos_goleiro : REAL;
+    pos_jogador : REAL;
+   
+END_VAR
+
+// Define a variavel de saida
+VAR_OUTPUT
+    pos_chute : REAL;
+END_VAR
+
+// Fuzzificando a variável de entrada 'pos_goleiro' (164 - 230)
+FUZZIFY pos_goleiro
+    TERM mto_esquerda := (164,1) (169,1) (176, 0);
+    TERM esquerda := (168.5,0) (175.5,1) (185.5, 1) (192.5, 0);
+    TERM centro := (185,0) (192,1) (202,1) (209,0);
+    TERM direita := (201.5, 0) (208.5, 1) (218.5, 1) (225.5, 0);
+    TERM mto_direita := (218, 0) (225, 1) (230, 1);
+END_FUZZIFY
+
+//Fuzzificando a variável de entrada 'pos_jogador' (30 - 368)
+FUZZIFY pos_jogador
+    TERM esquerda := (30, 1) (90, 1) (120, 0);
+    TERM centro := (99, 0) (129,1) (269, 1) (299, 0);
+    TERM direita :=(278,0) (308, 1) (368, 1);
+END_FUZZIFY
+
+
+
+// Defuzzificando a variável de saída 'pos_chute'
+DEFUZZIFY pos_chute
+    TERM mto_esquerda := (170,1) (172,1) (176, 0);
+    TERM esquerda := (173.5,0) (175.5,1) (185.5, 1) (192.5, 0);
+    TERM centro := (185,0) (192,1) (202,1) (209,0);
+    TERM direita := (201.5, 0) (208.5, 1) (216.5, 1) (217.5, 0);
+    TERM mto_direita := (214, 0) (218, 1) (220, 1);
+    // Utiliza 'Centro de Gravidade' como método de defuzzificação
+    METHOD : COG;
+    // Valor default é 197 (centro) (se nenhuma regra for ativada)
+    DEFAULT := 197;
+END_DEFUZZIFY
+
+
+RULEBLOCK No1
+    // Use 'min' for 'and' (also implicit use 'max'
+    // for 'or' to fulfill DeMorgan's Law)
+    AND : MIN;
+    // Use 'min' activation method
+    ACT : MIN;
+    // Use 'max' accumulation method
+    ACCU : MAX;
+
+    //goleiro mto_esquerda
+    RULE 1 : IF pos_goleiro IS mto_esquerda AND pos_jogador IS esquerda
+                THEN pos_chute IS direita;
+    RULE 2 : IF pos_goleiro IS mto_esquerda AND pos_jogador IS centro
+                THEN pos_chute IS direita;
+    RULE 3 : IF pos_goleiro IS mto_esquerda AND pos_jogador IS direita
+                THEN pos_chute IS direita;
+    //goleiro esquerda
+    RULE 4 : IF pos_goleiro IS esquerda AND pos_jogador IS esquerda
+                THEN pos_chute IS direita;
+    RULE 5 : IF pos_goleiro IS esquerda AND pos_jogador IS centro
+                THEN pos_chute IS direita;
+    RULE 6 : IF pos_goleiro IS esquerda AND pos_jogador IS direita
+                THEN pos_chute IS direita;
+    //goleiro centro
+    RULE 7 : IF pos_goleiro IS centro AND pos_jogador IS esquerda
+                THEN pos_chute IS esquerda;
+    RULE 8 : IF pos_goleiro IS centro AND pos_jogador IS centro
+                THEN pos_chute IS esquerda;
+    RULE 9 : IF pos_goleiro IS centro AND pos_jogador IS direita
+                THEN pos_chute IS direita;
+    //goleiro direita
+    RULE 10 : IF pos_goleiro IS direita AND pos_jogador IS esquerda
+                THEN pos_chute IS esquerda;
+    RULE 11 : IF pos_goleiro IS direita AND pos_jogador IS centro
+                THEN pos_chute IS esquerda;
+    RULE 12 : IF pos_goleiro IS direita AND pos_jogador IS direita
+                THEN pos_chute IS esquerda;
+    //goleiro mto_direita
+    RULE 13 : IF pos_goleiro IS direita AND pos_jogador IS esquerda
+                THEN pos_chute IS esquerda;
+    RULE 14 : IF pos_goleiro IS mto_direita AND pos_jogador IS centro
+                THEN pos_chute IS esquerda;
+    RULE 15 : IF pos_goleiro IS mto_direita AND pos_jogador IS direita
+                THEN pos_chute IS esquerda;
+
+
+
+END_RULEBLOCK
+
+
+END_FUNCTION_BLOCK

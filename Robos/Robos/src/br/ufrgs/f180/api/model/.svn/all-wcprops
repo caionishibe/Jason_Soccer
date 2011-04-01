@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/api/model
+END
+ElementInformation.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/api/model/ElementInformation.java
+END
+GameInformation.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/api/model/GameInformation.java
+END
+BallInformation.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/api/model/BallInformation.java
+END
+RobotInformation.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/api/model/RobotInformation.java
+END

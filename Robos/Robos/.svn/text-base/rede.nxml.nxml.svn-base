@@ -1,0 +1,108 @@
+<org.neuroph.nnet.Perceptron>
+  <changed>false</changed>
+  <obs>
+    <neuralNetworkViewFrame/>
+    <neuralNetworkViewFrame/>
+  </obs>
+  <type>PERCEPTRON</type>
+  <layers>
+    <layer>
+      <parentNetwork class="org.neuroph.nnet.Perceptron" reference="../../.."/>
+      <neurons>
+        <neuron>
+          <parentLayer reference="../../.."/>
+          <inputConnections/>
+          <outConnections>
+            <connection>
+              <connectedNeuron class="org.neuroph.nnet.comp.ThresholdNeuron">
+                <parentLayer>
+                  <parentNetwork class="org.neuroph.nnet.Perceptron" reference="../../../../../../../../.."/>
+                  <neurons>
+                    <org.neuroph.nnet.comp.ThresholdNeuron reference="../../.."/>
+                  </neurons>
+                </parentLayer>
+                <inputConnections>
+                  <connection>
+                    <connectedNeuron reference="../../../../../.."/>
+                    <weight>
+                      <value>-1319.887487669617</value>
+                    </weight>
+                  </connection>
+                  <connection>
+                    <connectedNeuron>
+                      <parentLayer reference="../../../../../../../../.."/>
+                      <inputConnections/>
+                      <outConnections>
+                        <connection>
+                          <connectedNeuron class="org.neuroph.nnet.comp.ThresholdNeuron" reference="../../../../../.."/>
+                          <weight>
+                            <value>1074.712654492017</value>
+                          </weight>
+                        </connection>
+                      </outConnections>
+                      <inputFunction>
+                        <weightsFunction class="org.neuroph.core.input.WeightedInput"/>
+                        <summingFunction class="org.neuroph.core.input.Sum"/>
+                      </inputFunction>
+                      <transferFunction class="org.neuroph.core.transfer.Linear">
+                        <slope>1.0</slope>
+                      </transferFunction>
+                    </connectedNeuron>
+                    <weight reference="../connectedNeuron/outConnections/connection/weight"/>
+                  </connection>
+                </inputConnections>
+                <outConnections/>
+                <inputFunction>
+                  <weightsFunction class="org.neuroph.core.input.WeightedInput"/>
+                  <summingFunction class="org.neuroph.core.input.Sum"/>
+                </inputFunction>
+                <transferFunction class="org.neuroph.core.transfer.Step">
+                  <yHigh>1.0</yHigh>
+                  <yLow>0.0</yLow>
+                </transferFunction>
+                <thresh>-62223.20736327656</thresh>
+              </connectedNeuron>
+              <weight reference="../connectedNeuron/inputConnections/connection/weight"/>
+            </connection>
+          </outConnections>
+          <inputFunction>
+            <weightsFunction class="org.neuroph.core.input.WeightedInput"/>
+            <summingFunction class="org.neuroph.core.input.Sum"/>
+          </inputFunction>
+          <transferFunction class="org.neuroph.core.transfer.Linear">
+            <slope>1.0</slope>
+          </transferFunction>
+        </neuron>
+        <neuron reference="../neuron/outConnections/connection/connectedNeuron/inputConnections/connection[2]/connectedNeuron"/>
+      </neurons>
+    </layer>
+    <layer reference="../layer/neurons/neuron/outConnections/connection/connectedNeuron/parentLayer"/>
+  </layers>
+  <inputNeurons>
+    <neuron reference="../../layers/layer/neurons/neuron"/>
+    <neuron reference="../../layers/layer/neurons/neuron/outConnections/connection/connectedNeuron/inputConnections/connection[2]/connectedNeuron"/>
+  </inputNeurons>
+  <outputNeurons reference="../layers/layer/neurons/neuron/outConnections/connection/connectedNeuron/parentLayer/neurons"/>
+  <learningRule class="org.neuroph.nnet.learning.PerceptronLearning">
+    <changed>false</changed>
+    <obs/>
+    <neuralNetwork class="org.neuroph.nnet.Perceptron" reference="../.."/>
+    <learningRate>0.5</learningRate>
+    <currentIteration>37271</currentIteration>
+    <maxIterations>0</maxIterations>
+    <iterationsLimited>true</iterationsLimited>
+    <totalNetworkError>0.0</totalNetworkError>
+    <maxError>0.01</maxError>
+  </learningRule>
+  <plugins>
+    <entry>
+      <string>LabelsPlugin</string>
+      <labelsPlugin>
+        <name>LabelsPlugin</name>
+        <parentNetwork class="org.neuroph.nnet.Perceptron" reference="../../../.."/>
+        <labels/>
+        <neuralNetworkLabel>rede.nxml</neuralNetworkLabel>
+      </labelsPlugin>
+    </entry>
+  </plugins>
+</org.neuroph.nnet.Perceptron>

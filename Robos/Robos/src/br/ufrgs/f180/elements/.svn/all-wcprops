@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements
+END
+Wall.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/Wall.java
+END
+Robot.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/Robot.java
+END
+WallCollisionPoint.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/WallCollisionPoint.java
+END
+MovingElement.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/MovingElement.java
+END
+Ball.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/Ball.java
+END
+GameField.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/GameField.java
+END
+VisualElement.java
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/Robos/!svn/ver/3/src/br/ufrgs/f180/elements/VisualElement.java
+END
