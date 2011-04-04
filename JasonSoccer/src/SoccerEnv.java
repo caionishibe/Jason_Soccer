@@ -6,6 +6,7 @@ import br.ufrgs.f180.api.Player;
 import br.ufrgs.f180.api.model.RobotInformation;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
+import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -18,9 +19,6 @@ import javax.xml.ws.Service;
 public class SoccerEnv extends Environment {
 
     private Logger logger = Logger.getLogger("tewntajason.mas2j." + SoccerEnv.class.getName());
-
-
-
     /**
      * Número de agentes no ambiente
      */
@@ -51,7 +49,7 @@ public class SoccerEnv extends Environment {
     private static FieldModel modelo = null;
     /* Ações */
     private static final Term termGire = Literal.parseLiteral("gire");
-    private static final Term termRotacioneBola = Literal.parseLiteral("rotacioneParaBola");
+    
 
     /*constantes dos controladores*/
     /**
@@ -77,40 +75,44 @@ public class SoccerEnv extends Environment {
             this.stop();
         }
 
-        addPercept(Literal.parseLiteral("percept(demo)"));
+        //addPercept(Literal.parseLiteral("percept(demo)"));
 
-        //pega informacao da posicao da bola
-        Point posBola = clientProxy.getBallInformation().getPosition();
-        int newPosBola[] = FieldModel.toJasonPosition(posBola);
+
         //instancia o modelo do campo
-        modelo = new FieldModel(newPosBola[0], newPosBola[1], NUMBER_OF_AGENTS);
+        modelo = new FieldModel(NUMBER_OF_AGENTS);
+
+
 
     }
 
     @Override
     public boolean executeAction(String agName, Structure action) {
+
         try {
+            this.updateAgPercept(agName);
             logger.info(agName + " doing: " + action);
 
             if (action.getFunctor().equals("createPlayer")) {
                 this.createPlayer(agName, action);
             }
 
+             if (action.getFunctor().equals("rotacioneParaBola")) {
+
+
+                Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
+                        Integer.parseInt(action.getTerm(1).toString()));
+                this.rotacionarParaPonto(posBola, clientProxy, agName);
+            }
+
             if (action.equals(termGire)) {
                 clientProxy.setPlayerRotation(agName, new Double(10));
             }
 
-            if(action.equals(this.termRotacioneBola))
-            {
-                Point posBola = clientProxy.getBallInformation().getPosition();
-                this.rotacionarParaPonto(posBola, clientProxy, agName);
-            }
+           
 
-            //atualiza a posicao da bola
-            Point posBola = clientProxy.getBallInformation().getPosition();
-            int newPosBola[] = FieldModel.toJasonPosition(posBola);
-            modelo.updateBallLocation(newPosBola[0], newPosBola[1]);
-            logger.info("Ball position: ( " + newPosBola[0] + "," + newPosBola[1] + ")");
+
+
+            //logger.info("Ball position: ( " + newPosBola[0] + "," + newPosBola[1] + ")");
 
             Thread.sleep(100);
 
@@ -197,5 +199,17 @@ public class SoccerEnv extends Environment {
 
     }
 
+    private void updateAgPercept(String agName) {
+        clearPercepts(agName);
+        // its location
 
+        Point ballPosition = clientProxy.getBallInformation().getPosition();
+        int ballGridPosition[] = FieldModel.toJasonPosition(ballPosition);
+
+        Literal p = ASSyntax.createLiteral("posBola",
+                ASSyntax.createNumber(ballGridPosition[0]),
+                ASSyntax.createNumber(ballGridPosition[1]));
+        addPercept(agName, p);
+
+    }
 }

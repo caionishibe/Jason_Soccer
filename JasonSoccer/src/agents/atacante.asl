@@ -1,7 +1,9 @@
 // Agente Atacante
 
 /* Initial beliefs and rules */
-posicaoInicial(8, 8).
+
+posicaoInicial(5, 8).
+		
 
 /* Initial goals */
 

@@ -1,7 +1,13 @@
 // Agente Atacante
 
 /* Initial beliefs and rules */
-posicaoInicial(8, 8).
+
+posicao(2,3).
+posicao(3,4).
+posicao(4,5).
+
+posicaoInicial(X, Y)
+		:- posicao(X,Y) & .free(X,Y).
 
 /* Initial goals */
 
@@ -14,7 +20,7 @@ posicaoInicial(8, 8).
 // criar o jogador no tewnta e comeca a dancar.
 +!entrarEmCampo : true
     <- ?posicaoInicial(X, Y);
-       createPlayer(X, Y);
+       createPlayer(X, Y, TEAM_A);
        !dance.
 
 // ao inserir o objetivo dance na base de conhecimentos, sob qualquer condicao

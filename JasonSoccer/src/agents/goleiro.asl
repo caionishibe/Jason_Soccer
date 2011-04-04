@@ -25,6 +25,7 @@ posicaoInicial(24, 8).
        !dance.
 	   
 +!olheBola : true
-	<- rotacioneParaBola;
+	<- ?posBola(X,Y);
+		rotacioneParaBola(X,Y);
 		!olheBola.
 		

@@ -7,8 +7,12 @@ MAS jasonSoccer {
     environment: SoccerEnv
     agents:
 
-		g1 /src/agents/goleiro.asl;
-		at1 /src/agents/atacante.asl;
+		goleiro 
+			/src/agents/goleiro.asl;
+		
+		atacante 
+			/src/agents/atacante.asl;
+			
 		
 	classpath: "lib/tewntaCommons.jar"; "lib/simulator.jar";
 

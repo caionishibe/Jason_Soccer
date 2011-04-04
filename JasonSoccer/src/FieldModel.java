@@ -18,26 +18,16 @@ public class FieldModel extends GridWorldModel {
     public static final double CELL_HEIGHT = 19.88;
     //constante para o objeto bola no grid
     public static final int BALL = 16;
-    //localização da bola
-    Location lBall = null;
+ 
 
-    public FieldModel(int xBola, int yBola, int numberAgents) {
+    public FieldModel(int numberAgents) {
         //cria um grid com numberAgents agentes
         super(GRID_WIDTH, GRID_HEIGHT, numberAgents);
 
-        this.lBall = new Location(xBola, yBola);
+     
     }
 
-    /**
-     * Método que atualiza a posicao da bola no grid
-     * @param x posicao X no grid
-     * @param y posicao Y no grid
-     */
-    public void updateBallLocation(int x, int y) {
-        this.lBall = new Location(x, y);
-
-    }
-
+   
     /**
      * Método estático que converte coodernadas do grid para coordenadas do tewnta
      * @param x Coordenada x do grid
