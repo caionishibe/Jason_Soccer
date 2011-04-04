@@ -14,7 +14,7 @@ posicaoInicial(8, 8).
 // criar o jogador no tewnta e comeca a dancar.
 +!entrarEmCampo : true
     <- ?posicaoInicial(X, Y);
-       createPlayer(X, Y);
+       createPlayer(X, Y, TEAM_A);
        !dance.
 
 // ao inserir o objetivo dance na base de conhecimentos, sob qualquer condicao

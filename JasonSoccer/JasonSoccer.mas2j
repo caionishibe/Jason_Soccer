@@ -1,12 +1,12 @@
-/* Jason Project */
-
-MAS jasonSoccer {
-
-    infrastructure: Centralised
-
-    environment: SoccerEnv
+/* Jason Project */
 
-    agents:
+
+
+MAS jasonSoccer {
+    infrastructure: Centralised
+    environment: SoccerEnv
+    agents:
+
 		g1 /src/agents/goleiro.asl;
 		at1 /src/agents/atacante.asl;
 		
@@ -14,5 +14,6 @@ MAS jasonSoccer {
 
         
 
-}
+}
+
 

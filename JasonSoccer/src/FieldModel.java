@@ -38,7 +38,13 @@ public class FieldModel extends GridWorldModel {
 
     }
 
-    public Point toTewntaPosition(int x, int y) {
+    /**
+     * Método estático que converte coodernadas do grid para coordenadas do tewnta
+     * @param x Coordenada x do grid
+     * @param y Coordenada y do grid
+     * @return Retorna um <code>Point</code> com a posição do tewnta referente ao grid
+     */
+    public static Point toTewntaPosition(int x, int y) {
         Point tewntaPosition = null;
 
         double xNew = 30 + (x * FieldModel.CELL_WIDTH) + (FieldModel.CELL_WIDTH / 2);
@@ -49,7 +55,13 @@ public class FieldModel extends GridWorldModel {
         return tewntaPosition;
     }
 
-    public int[] toJasonPosition(Point p)
+    /**
+     * Método estático que converte coordenadas do tewnta para coordenadas do grid
+     * @param p <code>Point</code> contendo as coordenadas do tewnta
+     * @return Retorna um vetor contendo na posição 0 a coordenada x do grid e na posicao
+     * 1 a coordenada y do grid
+     */
+    public static int[] toJasonPosition(Point p)
     {
         int jasonPosition[] = new int[2];
 
