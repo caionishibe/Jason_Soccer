@@ -54,7 +54,10 @@ public class SoccerEnv extends Environment {
     private static final Term termRotacioneBola = Literal.parseLiteral("rotacioneParaBola");
 
     /*constantes dos controladores*/
-    private static final double KP_ROTACIONAR = 0.05;
+    /**
+     * KP - CAIO
+     */
+    private static final double KP_ROTACIONAR = 0.12;
 
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
@@ -109,7 +112,7 @@ public class SoccerEnv extends Environment {
             modelo.updateBallLocation(newPosBola[0], newPosBola[1]);
             logger.info("Ball position: ( " + newPosBola[0] + "," + newPosBola[1] + ")");
 
-            Thread.sleep(2000);
+            Thread.sleep(100);
 
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
