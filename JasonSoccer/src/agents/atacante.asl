@@ -1,30 +1,46 @@
-// Agente Atacante
+// Agente: Atacante
 
 /* Initial beliefs and rules */
 
-posicaoInicial(5, 8).
+posicao(5, 8).
+time(team_a).
 		
 
 /* Initial goals */
 
-// objetivo inicial apenas entrar em campo
+// Objetivo inicial: entrar em campo
 !entrarEmCampo.
 
 /* Plans */
 
-// ao entrar em campo, obter a posicao inicial do jogador em campo,
-// criar o jogador no tewnta e comeca a dancar.
+// ao entrar em campo, obter a posicao inicial do jogador em campo e o time,
+// criar o jogador no tewnta e comecar a rastrear a bola.
 +!entrarEmCampo : true
-    <- ?posicaoInicial(X, Y);
-       createPlayer(X, Y, TEAM_A);
-       !dance.
-
-// ao inserir o objetivo dance na base de conhecimentos, sob qualquer condicao
-// (sempre true), gire, pule e continue dancando.
-+!dance : true
-    <- gire;
-       pule;
-       !dance.
+    <-  ?posicao(X,Y); ?time(Z);
+       createPlayer(X, Y, Z);
+       !iniciaAtaque.
+	   
+//Plano que contem todos os subplanos executados para que a estrategia de ataque
+//seja cumprida. Inicialmente existe apenas dois subplanos possiveis: olheBola e
+//buscaBola. Porem serao adicionados durante o decorrer do trabalho os demais subplanos
+//como passe, chute etc.
++!iniciaAtaque : true
+	<- !olheBola;
+	   !iniciaAtaque.
+	
+	
+//Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
++!olheBola : true
+	<- ?posBola(X,Y);
+		rotacioneParaBola(X,Y);
+		!olheBola.
+		
+		
+//Vai em direcao a posicao da bola.
++!buscaBola : true
+	<- ?posBola(X,Y);
+		irLinhaReta(X,Y);
+		!buscaBola.
 
 
 

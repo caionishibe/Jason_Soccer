@@ -1,0 +1,1 @@
+java -Djava.library.path=./jni -cp simulator.jar br.ufrgs.f180.team.DemoTeam

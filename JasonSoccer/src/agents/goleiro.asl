@@ -1,31 +1,36 @@
-// Agente Goleiro
+// Agente: Goleiro
 
 /* Initial beliefs and rules */
+
 posicaoInicial(24, 8).
+time(team_b).
 
-/* Initial goals */
+/* Initial goal */
 
-// objetivo inicial e apenas entrar em campo
+// Objetivo inicial: entrar em campo 
 !entrarEmCampo.
 
 /* Plans */
 
-// ao entrar em campo, obter a posicao inicial do jogador em campo,
-// criar o jogador no tewnta e comecar a dancar.
+// Ao entrar em campo, obter a posicao inicial do jogador em campo,
+// criar o jogador no tewnta e iniciar a defesa.
 +!entrarEmCampo : true
-    <- ?posicaoInicial(X, Y);
-       createPlayer(X, Y,TEAM_B);
-	   !olheBola.
-
-// ao inserir o objetivo dance na base de conhecimentos, sob qualquer condicao
-// (sempre true), gire, pule e continue dancando.
-+!dance : true
-    <- gire;
-       pule;
-       !dance.
+    <- ?posicaoInicial(X, Y); ?time(Z);
+       createPlayer(X, Y,Z);
+	   !iniciaDefesa.
 	   
+//Após criado o goleiro, inicia-se o plano de defesa.
+//Dentro deste plano estarao os subplanos que serao executados, por enquanto
+//existe apenas o olheBola, porém existirá o recua, avanca, defende etc.
++!iniciaDefesa : true
+	<- !olheBola;
+		!iniciaDefesa.
+	   
+	   
+//Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- ?posBola(X,Y);
 		rotacioneParaBola(X,Y);
 		!olheBola.
+		
 		
