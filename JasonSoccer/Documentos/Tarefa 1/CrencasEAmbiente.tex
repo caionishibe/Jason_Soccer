@@ -68,8 +68,8 @@ LUÍS GUILHERME BERGAMINI MENDES}\\
 \begin{espacosimples}
 Relatório apresentado à Disciplina de Sistemas Inteligentes 2, do Departamento Acadêmico de Informática - DAINF - do Curso Superior
 de Engenharia de Computação da Universidade Tecnológica Federal do Paraná - UTFPR, como requisito parcial para finalização da disciplina.\\ [0.5cm]
-Prof. Cesar Augusto Tacla\\
-Prof. Gustavo Giménez Lugo
+Prof. Dr. Cesar Augusto Tacla\\
+Prof. Dr. Gustavo Giménez Lugo
 \end{espacosimples}
 \end{minipage}
 
@@ -98,28 +98,28 @@ O ambiente Jason irá se comunicar com o simulador Tewnta, que fará a tradução pa
 
 \section{Descrição do Ambiente}
 
-No simulador Tewnta versão 1.3, o campo possui a dimensão de 490 x 338 pixels. Cada robô possui, aproxidamente, um diâmetro de 20 pixels. Com isso, foi criado um grid 25 x 17 em que somente um robô pode ocupar uma das posições no grid, dado um instante de tempo. A bola não é considerada um agente, sendo apenas um objeto do mundo, portanto poderá estar em uma mesma célula que um jogador.
+No simulador Tewnta versão 1.3, o campo possui a dimensão de 490 x 338 pixels. Cada robô possui, aproxidamente, um diâmetro de 20 pixels. Com isso, foi criado um grid 25 x 17 em que somente um robô pode ocupar uma das posições no grid, dado um instante de tempo (Figura \ref{grid}). A bola não é considerada um agente, sendo apenas um objeto do mundo, portanto poderá estar em uma mesma célula que um jogador.
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{Grid.png}
 \end{center}
 \caption{Grid modelado}
-\label{fig:grid}
+\label{grid}
 \end{figure}
 
 \chapter{Agentes}
 
 \section{Movimentos Possíveis}
 
-Considerando um agente que ocupa uma posição dentro do grid definido no ambiente, existem oito possíveis direções de movimentação.
+Considerando um agente que ocupa uma posição dentro do grid definido no ambiente, existem oito possíveis direções de movimentação (Figura \ref{movimentos}).
 
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.3\textwidth]{Movimentos.png}
 \end{center}
 \caption{Movimentos possíveis para um agente que ocupa uma célula do grid}
-\label{fig:grid}
+\label{movimentos}
 \end{figure}
 
 Os oito movimentos foram definidos da seguinte forma:
@@ -145,7 +145,7 @@ Quando o sistema é iniciado, o agente necessita de crenças iniciais para que pos
 \item \textbf{Entrar em campo}: os agentes são posicionados no campo. A partir daí, no caso específico do goleiro, será iniciado o plano de defesa. No caso do atacante, será iniciado o plano de marcar um gol.
 \end{itemize}
 
-As linhas de código a seguir mostram as implementações de crenças iniciais para o atacante e goleiro, em Jason, assim como seus objetivos iniciais.
+As linhas de código apresentadas no Quadro \ref{qd1} mostram as implementações de crenças iniciais para o atacante e goleiro, em Jason, assim como seus objetivos iniciais.
 
 \begin{quadro}[!h] 
 \begin{verbatim}
@@ -170,7 +170,7 @@ time(team_b).
 !entrarEmCampo.
 \end{verbatim}
 \caption{Definição de crenças iniciais, em Jason}
-\label{cren-ini-jason}
+\label{qd1}
 \end{quadro}
 
 \section{Ações Possíveis}
@@ -184,7 +184,7 @@ Ambos os agentes, atacante e goleiro, possuem um conjunto básico de ações possív
 
 \subsection{Atacante}
 
-No caso específico do atacante, há uma série de possíveis ações. O chute ao gol ocorre após a deliberação do agente ao perceber que está numa situação favorável para chutar ao gol. O passe é o toque da bola a um agente próximo, desde que seja do mesmo time. Há também a marcação, que consiste em acompanhar um jogador adversário no intuito de interceptar a bola. A ação de posicionar-se no campo é necessária, pois um agente pode escolher esperar a bola em um determinado local antes de executar a próxima ação. Há também ações de enviar e receber estratégia, que faz uso das funções de broadcast para informar os outros agentes das intenções atuais. A ação de pedir bola é feita quando o agente infere que está numa posição favorável para chute. Por fim, um agente pode buscar a bola em alguma posição do campo, caso nenhum outro agente esteja com posse. Em resumo:
+No caso específico do atacante, há uma série de possíveis ações. O chute ao gol ocorre após a deliberação do agente ao perceber que está numa situação favorável para chutar ao gol. O passe é o toque da bola a um agente próximo, desde que seja do mesmo time. Há também a marcação, que consiste em acompanhar um jogador adversário no intuito de interceptar a bola. A ação de posicionar-se no campo é necessária, pois um agente pode escolher esperar a bola em um determinado local antes de executar a próxima ação. Há também ações de enviar e receber estratégia, que faz uso das funções de \textit{broadcast} para informar os outros agentes das intenções atuais. A ação de pedir bola é feita quando o agente infere que está numa posição favorável para chute. Por fim, um agente pode buscar a bola em alguma posição do campo, caso nenhum outro agente esteja com posse. Em resumo:
 
 \begin{itemize}
 \item Chute ao gol;
@@ -211,11 +211,11 @@ O goleiro não poderá sair de sua área em frente ao gol, com exceção de um pequen
 
 \chapter{Tewnta e Jason}
 
-Para a modelagem das crenças iniciais assim como das possíveis ações de cada agente, foi adotada a linguagem Jason, baseada em AgentSpeak. Para colocar em prática a modelagem em questão, foi usado o simulador Tewnta.
+Para a modelagem das crenças iniciais assim como das possíveis ações de cada agente, foi adotada a linguagem Jason, baseada em \textit{AgentSpeak}. Para colocar em prática a modelagem em questão, foi usado o simulador Tewnta.
 
 \section{Código Jason}
 
-Inicialmente, deve-se criar um arquivo em Jason (extensão .mas2j) que define o ambiente, agentes e classpaths em Java para executar \cite{agentspeak}. Os arquivos de classpath correspondem aos executáveis do Tewnta. O ambiente corresponde ao nome da classe em Java que implementa as ações definidas para o agente.
+Inicialmente, deve-se criar um arquivo em Jason (extensão \texttt{.mas2j}) que define o ambiente, agentes e classpaths em Java para executar \cite{agentspeak}. Os arquivos de classpath correspondem aos executáveis do Tewnta. O ambiente corresponde ao nome da classe em Java que implementa as ações definidas para o agente (Quadro \ref{cod-jason-1}).
 
 \begin{quadro}[!h] 
 \begin{verbatim}
@@ -238,7 +238,7 @@ Os arquivos \texttt{goleiro.asl} e \texttt{atacante.asl} contêm as definições de
 
 \section{Código Java/Tewnta}
 
-Na sequência, a classe SoccerEnv, em Java, implementa a comunicação com o Tewnta através da conexão com o webservice criado pela aplicação. O ambiente modelo é em seguida instanciado, através da classe FieldModel, que contém a definição do grid e métodos de conversão deste grid para medidas do campo. Ações definidas em Jason devem ser acessadas em Java através de uma sintaxe apropriada, que envolve a classe \texttt{Literal} ou diretamente por Strings. As linhas a seguir demonstram esse acesso:
+Na sequência, a classe \texttt{SoccerEnv}, em Java, implementa a comunicação com o Tewnta através da conexão com o \textit{webservice} criado pela aplicação. O ambiente modelo é em seguida instanciado, através da classe \texttt{FieldModel}, que contém a definição do grid e métodos de conversão deste grid para medidas do campo. Ações definidas em Jason devem ser acessadas em Java através de uma sintaxe apropriada, que envolve a classe \texttt{Literal} ou diretamente por Strings. O Quadro \ref{cod-jason-2} demonstra esse acesso:
 
 \begin{quadro}[!h] 
 \begin{verbatim}
@@ -257,7 +257,7 @@ Os demais métodos implementados na classe SoccerEnv correspondem ao controle do 
 
 \chapter{Conclusão}
 
-Através da realização desta tarefa, foi possível testar de maneira prática a implementação de um agente que segue o modelo BDI para atingir um objetivo. Durante esta primeira fase, foram modeladas as crenças iniciais dos agentes, assim como suas possíveis ações dentro do ambiente definido. A comunicação do ambiente Jason, que permite escrever sentenças com a linguagem AgentSpeak, foi posta em prática com o simulador Tewnta. Com esta base definida, pode-se partir para fases futuras que incluem a implementação dos comportamentos definidos para os agentes modelados.
+Através da realização desta tarefa, foi possível testar de maneira prática a implementação de um agente que segue o modelo BDI para atingir um objetivo. Durante esta primeira fase, foram modeladas as crenças iniciais dos agentes, assim como suas possíveis ações dentro do ambiente definido. A comunicação do ambiente Jason, que permite escrever sentenças com a linguagem \textit{AgentSpeak}, foi posta em prática com o simulador Tewnta. Com esta base definida, pode-se partir para fases futuras que incluem a implementação dos comportamentos definidos para os agentes modelados.
 
 % referencias: livro helder, site jason, site tewnta, livro agentspeak
 
