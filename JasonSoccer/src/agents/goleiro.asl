@@ -30,7 +30,6 @@ time(team_b).
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- ?posBola(X,Y);
-		rotacioneParaBola(X,Y);
-		!olheBola.
+		rotacioneParaBola(X,Y).
 		
 		

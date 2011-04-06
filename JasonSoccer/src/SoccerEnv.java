@@ -251,12 +251,19 @@ public class SoccerEnv extends Environment {
                 ASSyntax.createNumber(ballGridPosition[1]));
         addPercept(agName, p);
 
+        //atualiza a posicao do agente
+        Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
+        int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
+
+        
+        Literal pa = ASSyntax.createLiteral("posicao",
+                ASSyntax.createNumber(agentGridPosition[0]),
+                ASSyntax.createNumber(agentGridPosition[1]));
+        addPercept(agName, pa);
     }
 
-    private void updateAgsPercept()
-    {
-        for(Jogador j : jogadores)
-        {
+    private void updateAgsPercept() {
+        for (Jogador j : jogadores) {
             this.updateAgPercept(j.getNome());
         }
     }

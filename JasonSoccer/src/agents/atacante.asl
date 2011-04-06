@@ -4,7 +4,8 @@
 
 posicao(5, 8).
 time(team_a).
-		
+
+
 
 /* Initial goals */
 
@@ -25,22 +26,23 @@ time(team_a).
 //buscaBola. Porem serao adicionados durante o decorrer do trabalho os demais subplanos
 //como passe, chute etc.
 +!iniciaAtaque : true
-	<- !olheBola;
+	<- !buscaBola; 
+	   !olheBola;
 	   !iniciaAtaque.
 	
 	
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- ?posBola(X,Y);
-		rotacioneParaBola(X,Y);
-		!olheBola.
+		rotacioneParaBola(X,Y).
 		
 		
 //Vai em direcao a posicao da bola.
 +!buscaBola : true
 	<- ?posBola(X,Y);
-		irLinhaReta(X,Y);
-		!buscaBola.
+		irLinhaReta(X,Y).
+		
+
 
 
 
