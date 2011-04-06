@@ -7,6 +7,7 @@ import br.ufrgs.f180.api.model.RobotInformation;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -48,7 +49,10 @@ public class SoccerEnv extends Environment {
      */
     private static FieldModel modelo = null;
     /* Ações */
-    private static final Term termGire = Literal.parseLiteral("gire");
+    private static final Term TERM_GIRE = Literal.parseLiteral("gire");
+    private static final String FUNCTOR_CREATE_PLAYER = "createPlayer";
+    private static final String FUNCTOR_ROTACIONE_PARA_BOLA = "rotacioneParaBola";
+    private static final String FUNCTOR_IR_LINHA_RETA = "irLinhaReta";
     /*constantes dos controladores*/
     /**
      * KP - CAIO
@@ -107,37 +111,49 @@ public class SoccerEnv extends Environment {
     public boolean executeAction(String agName, Structure action) {
 
         try {
-            this.updateAgPercept(agName);
+
+            if (!(action.getFunctor().equals(FUNCTOR_CREATE_PLAYER))) {
+                this.updateAgPercept(agName);
+            }
+
             logger.info(agName + " doing: " + action);
 
-            if (action.getFunctor().equals("createPlayer")) {
+            if (action.getFunctor().equals(FUNCTOR_CREATE_PLAYER)) {
                 this.createPlayer(agName, action);
                 //atualiza as percepcoes dos agentes criados
-                this.updateAgsPercept();
+                this.updateAgPercept(agName);
 
             }
-            if (action.getFunctor().equals("rotacioneParaBola")) {
+            if (action.getFunctor().equals(FUNCTOR_ROTACIONE_PARA_BOLA)) {
 
                 Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
                         Integer.parseInt(action.getTerm(1).toString()));
                 this.rotacionarParaPonto(posBola, clientProxy, agName);
             }
-            if (action.getFunctor().equals("irLinhaReta")) {
+            if (action.getFunctor().equals(FUNCTOR_IR_LINHA_RETA)) {
                 Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
                         Integer.parseInt(action.getTerm(1).toString()));
 
                 Jogador jogadorAtual = null;
-                for (Jogador j : jogadores) {
-                    if (j.getNome().equals(agName)) {
-                        jogadorAtual = j;
+
+                synchronized (jogadores) {
+                    Iterator<Jogador> jogadoresIterator = jogadores.iterator();
+
+                    while (jogadoresIterator.hasNext()) {
+                        Jogador j = jogadoresIterator.next();
+                        if (j.getNome().equals(agName)) {
+                            jogadorAtual = j;
+                        }
                     }
                 }
 
+
                 jogadorAtual.setPosicaoDesejada(posBola);
                 SoccerEnv.irLinhaReta(clientProxy, jogadorAtual);
+
             }
 
-            if (action.equals(termGire)) {
+            if (action.equals(TERM_GIRE)) {
                 clientProxy.setPlayerRotation(agName, new Double(10));
             }
 
@@ -182,7 +198,11 @@ public class SoccerEnv extends Environment {
         Jogador novoJogador = new Jogador(position.getX(), position.getY());
         novoJogador.setNome(agName);
         novoJogador.setPosicaoDesejada(position);
-        jogadores.add(novoJogador);
+
+        synchronized (jogadores) {
+            jogadores.add(novoJogador);
+        }
+
 
     }
 
@@ -254,18 +274,10 @@ public class SoccerEnv extends Environment {
         //atualiza a posicao do agente
         Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
         int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
-
-        
         Literal pa = ASSyntax.createLiteral("posicao",
                 ASSyntax.createNumber(agentGridPosition[0]),
                 ASSyntax.createNumber(agentGridPosition[1]));
         addPercept(agName, pa);
-    }
-
-    private void updateAgsPercept() {
-        for (Jogador j : jogadores) {
-            this.updateAgPercept(j.getNome());
-        }
     }
 
     /**
@@ -285,6 +297,10 @@ public class SoccerEnv extends Environment {
         System.out.println("Posição: " + posJog.getY() + " - " + p.getY());
 
         //se na estiver no ponto desejado
+
+
+
+
         if (posJog != p) {
 
             //controle PID
@@ -294,28 +310,66 @@ public class SoccerEnv extends Environment {
             Double rY = p.getY() - posJog.getY();
 
             //zera os erros mínimos
+
+
+
+
             if (Math.abs(rX) < ERRO_MIN) {
                 rX = 0.0;
+
+
+
+
             }
             if (Math.abs(rY) < ERRO_MIN) {
                 rY = 0.0;
-            }
 
-            //Integral
+
+
+
+            } //Integral
             double iX = dt * kI * ((rX + j.getXErro()) / 2 + j.getiXAnt());
+
+
+
+
             double iY = dt * kI * ((rY + j.getYErro()) / 2 + j.getiYAnt());
 
             //Proporcional
+
+
+
+
             double pX = rX * kP;
+
+
+
+
             double pY = rY * kP;
 
             //Derivativo
+
+
+
+
             double dX = kD * (rX - j.getXErro()) / dt;
+
+
+
+
             double dY = kD * (rY - j.getYErro()) / dt;
 
             //velocidade em x
+
+
+
+
             double vX = pX + iX + dX;
             //velocidade em y
+
+
+
+
             double vY = pY + iY + dY;
 
             //redefine os atributos do jogador
@@ -332,6 +386,8 @@ public class SoccerEnv extends Environment {
             cliente.setPlayerVelocity(j.getNome(), vX, vY);
             System.out.println("Vx: " + vX);
             System.out.println("Vy: " + vY);
+
+
         }
     }
 }
