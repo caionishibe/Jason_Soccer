@@ -7,6 +7,7 @@ time(team_a).
 
 
 
+
 /* Initial goals */
 
 // Objetivo inicial: entrar em campo

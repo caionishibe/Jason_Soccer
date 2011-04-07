@@ -2,7 +2,7 @@
 
 /* Initial beliefs and rules */
 
-posicaoInicial(24, 8).
+posicao(24, 8).
 time(team_b).
 
 /* Initial goal */
@@ -15,7 +15,7 @@ time(team_b).
 // Ao entrar em campo, obter a posicao inicial do jogador em campo,
 // criar o jogador no tewnta e iniciar a defesa.
 +!entrarEmCampo : true
-    <- ?posicaoInicial(X, Y); ?time(Z);
+    <- ?posicao(X, Y); ?time(Z);
        createPlayer(X, Y,Z);
 	   !iniciaDefesa.
 	   
