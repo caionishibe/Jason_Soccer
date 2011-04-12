@@ -10,8 +10,14 @@ MAS jasonSoccer {
 		goleiro 
 			/src/agents/goleiro.asl;
 		
-		atacante 
-			/src/agents/atacante.asl;
+		atacanteMeio 
+			/src/agents/aMeio.asl;
+			
+		atacanteDireita
+			/src/agents/aDireita.asl;
+		
+		atacanteEsquerda
+			/src/agents/aEsquerda.asl;		
 			
 		
 	classpath: "lib/tewntaCommons.jar"; "lib/simulator.jar";

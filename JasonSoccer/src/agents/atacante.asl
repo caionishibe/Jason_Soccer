@@ -1,13 +1,5 @@
 // Agente: Atacante
 
-/* Initial beliefs and rules */
-
-posicao(5, 8).
-time(team_a).
-
-
-
-
 /* Initial goals */
 
 // Objetivo inicial: entrar em campo
@@ -18,7 +10,7 @@ time(team_a).
 // ao entrar em campo, obter a posicao inicial do jogador em campo e o time,
 // criar o jogador no tewnta e comecar a rastrear a bola.
 +!entrarEmCampo : true
-    <-  ?posicao(X,Y); ?time(Z);
+    <-  ?posicaoIni(X,Y); ?time(Z);
        createPlayer(X, Y, Z);
        !iniciaAtaque.
 	   
@@ -27,7 +19,7 @@ time(team_a).
 //buscaBola. Porem serao adicionados durante o decorrer do trabalho os demais subplanos
 //como passe, chute etc.
 +!iniciaAtaque : true
-	<- !buscaBola; 
+	<- !!buscaBola; 
 	   !olheBola;
 	   !iniciaAtaque.
 	
@@ -38,8 +30,8 @@ time(team_a).
 		rotacioneParaBola(X,Y).
 		
 		
-//Vai em direcao a posicao da bola.
-+!buscaBola : true
+//Vai em direcao a posicao da bola se estiver perto mas nao estiver com a bola
++!buscaBola :perto(bola) & not com(bola)
 	<- ?posBola(X,Y);
 		irLinhaReta(X,Y).
 		

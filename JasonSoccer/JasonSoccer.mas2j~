@@ -1,0 +1,23 @@
+/* Jason Project */
+
+
+
+MAS jasonSoccer {
+    infrastructure: Centralised
+    environment: SoccerEnv
+    agents:
+
+		goleiro 
+			/src/agents/goleiro.asl;
+		
+		atacante 
+			/src/agents/atacante.asl;
+			
+		
+	classpath: "lib/tewntaCommons.jar"; "lib/simulator.jar";
+
+        
+
+}
+
+

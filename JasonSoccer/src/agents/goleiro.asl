@@ -20,19 +20,24 @@ time(team_b).
 +!entrarEmCampo : true
     <- ?posicao(X, Y); ?time(Z);
        createPlayer(X, Y,Z);
-	   !iniciaDefesa.
+	   !defender.
 	   
 //Após criado o goleiro, inicia-se o plano de defesa.
-//Dentro deste plano estarao os subplanos que serao executados, por enquanto
-//existe apenas o olheBola, porém existirá o recua, avanca, defende etc.
-+!iniciaDefesa : true
-	<- !olheBola;
-		!iniciaDefesa.
+
+//caso contrário
++!defender : true
+	<- 	?posBola(XBola,YBola);
+		?posicao(XGoleiro, YGoleiro);
+		!!olheBola;
+		defender(XBola, YBola, XGoleiro, YGoleiro); 
+		!defender.
 	   
 	   
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- ?posBola(X,Y);
 		rotacioneParaBola(X,Y).
+		
+
 		
 		

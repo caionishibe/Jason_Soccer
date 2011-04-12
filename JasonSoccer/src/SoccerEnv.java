@@ -3,7 +3,6 @@ import jason.asSyntax.*;
 import jason.environment.*;
 import java.util.logging.*;
 import br.ufrgs.f180.api.Player;
-import br.ufrgs.f180.api.model.RobotInformation;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,37 +49,18 @@ public class SoccerEnv extends Environment {
     private static FieldModel modelo = null;
     /* Ações */
     private static final Term TERM_GIRE = Literal.parseLiteral("gire");
-    private static final String FUNCTOR_CREATE_PLAYER = "createPlayer";
-    private static final String FUNCTOR_ROTACIONE_PARA_BOLA = "rotacioneParaBola";
-    private static final String FUNCTOR_IR_LINHA_RETA = "irLinhaReta";
-    /*constantes dos controladores*/
-    /**
-     * KP - CAIO
-     */
-    private static final double KP_ROTACIONAR = 0.12;
-    /**
-     * Intervalo de tempo
-     */
-    public static final double dt = 0.1;
-    /*Caio*/
-    /**
-     * Ganho proporcional
-     */
-    public static final double kP = 4.5;
-    /**
-     * Ganho integral
-     */
-    public static final double kI = 0; //1.75;//1.75;
-    /**
-     * Ganho derivativo
-     */
-    public static final double kD = 0; //1.4;//1.4;
-    /**
-     * Erro mínimo
-     */
-    public static final double ERRO_MIN = 0.05;
-    /*Vetor contendo os jogadores*/
-    private ArrayList<Jogador> jogadores = new ArrayList<Jogador>();
+    private static final Literal PERTO_BOLA = Literal.parseLiteral("perto(bola)");
+    private static final Literal NAO_DOMINADA = Literal.parseLiteral("naoDominada(bola)");
+    private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
+    private static final String CREATE_PLAYER = "createPlayer";
+    private static final String ROTACIONE_PARA_BOLA = "rotacioneParaBola";
+    private static final String IR_LINHA_RETA = "irLinhaReta";
+    private static final String DEFENDER_GOL = "defender";
+    /*Jogadores*/
+    private static final Jogador goleiro = new Jogador(0, 0);
+    private static final Jogador atacanteMeio = new Jogador(0, 0);
+    private static final Jogador atacanteDireita = new Jogador(0, 0);
+    private static final Jogador atacanteEsquerda = new Jogador(0, 0);
 
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
@@ -110,51 +90,72 @@ public class SoccerEnv extends Environment {
     @Override
     public boolean executeAction(String agName, Structure action) {
 
+        if (!(action.getFunctor().equals(CREATE_PLAYER))) {
+            this.updateAgPercept(agName);
+        }
+
         try {
 
-            if (!(action.getFunctor().equals(FUNCTOR_CREATE_PLAYER))) {
-                this.updateAgPercept(agName);
-            }
 
             logger.info(agName + " doing: " + action);
 
-            if (action.getFunctor().equals(FUNCTOR_CREATE_PLAYER)) {
+            if (action.getFunctor().equals(CREATE_PLAYER)) {
                 this.createPlayer(agName, action);
                 //atualiza as percepcoes dos agentes criados
                 this.updateAgPercept(agName);
 
             }
-            if (action.getFunctor().equals(FUNCTOR_ROTACIONE_PARA_BOLA)) {
-
+            if (action.getFunctor().equals(ROTACIONE_PARA_BOLA)) {
                 Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
                         Integer.parseInt(action.getTerm(1).toString()));
-                this.rotacionarParaPonto(posBola, clientProxy, agName);
+                MetodosAuxiliares.rotacionarParaPonto(posBola, clientProxy, agName);
             }
-            if (action.getFunctor().equals(FUNCTOR_IR_LINHA_RETA)) {
+            if (action.getFunctor().equals(IR_LINHA_RETA)) {
                 Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
                         Integer.parseInt(action.getTerm(1).toString()));
 
-                Jogador jogadorAtual = null;
+                this.getJogadorByName(agName).setPosicaoDesejada(posBola);
+                MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
 
-                synchronized (jogadores) {
-                    Iterator<Jogador> jogadoresIterator = jogadores.iterator();
+            }
 
-                    while (jogadoresIterator.hasNext()) {
-                        Jogador j = jogadoresIterator.next();
-                        if (j.getNome().equals(agName)) {
-                            jogadorAtual = j;
-                        }
+            if (action.getFunctor().equals(DEFENDER_GOL)) {
+
+                Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
+                        Integer.parseInt(action.getTerm(1).toString()));
+                Point posGole = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(2).toString()),
+                        Integer.parseInt(action.getTerm(3).toString()));
+
+                double xIniGoleiro = FieldModel.toTewntaPosition(24, 0).getX();
+
+                //se a bola estiver acima da posicao do goleiro
+                if (posBola.getY() > posGole.getY()) {
+                    //se a bola estiver acima da trave do gol
+                    if (posBola.getY() > 230) {
+                        //goleiro fica na trave
+                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 229.0));
+                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+                        //se a bola estiver dentro dos limites do gol
+                    } else {
+                        //goleiro se posiciona conforme bola
+                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
+                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+                    }
+
+                    //se a bola estiver abaixo da posicao do goleiro
+                } else if (posBola.getY() <= posGole.getY()) {
+                    //se a bola estiver abaixo da trave do gol
+                    if (posBola.getY() < 170) {
+                        //goleiro fica na trave
+                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 171.0));
+                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+                        //se a bola estiver dentro dos limites do gol
+                    } else {
+                        //goleiro se posiciona conforme bola
+                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
+                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
                     }
                 }
-
-
-                jogadorAtual.setPosicaoDesejada(posBola);
-                SoccerEnv.irLinhaReta(clientProxy, jogadorAtual);
-
-            }
-
-            if (action.equals(TERM_GIRE)) {
-                clientProxy.setPlayerRotation(agName, new Double(10));
             }
 
             //logger.info("Ball position: ( " + newPosBola[0] + "," + newPosBola[1] + ")");
@@ -172,6 +173,53 @@ public class SoccerEnv extends Environment {
     @Override
     public void stop() {
         super.stop();
+    }
+
+    /**
+     * Atualiza as percepções do agente passado como parâmetro
+     * @param agName nome do agente a atualizar as percepções
+     */
+    private void updateAgPercept(String agName) {
+        this.clearPercepts(agName);
+
+        //atualiza posicao da bola
+        Point ballPosition = clientProxy.getBallInformation().getPosition();
+        int ballGridPosition[] = FieldModel.toJasonPosition(ballPosition);
+
+        Literal p = ASSyntax.createLiteral("posBola",
+                ASSyntax.createNumber(ballGridPosition[0]),
+                ASSyntax.createNumber(ballGridPosition[1]));
+        addPercept(agName, p);
+
+
+
+        //atualiza a posicao do agente
+        Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
+        int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
+        Literal pa = ASSyntax.createLiteral("posicao",
+                ASSyntax.createNumber(agentGridPosition[0]),
+                ASSyntax.createNumber(agentGridPosition[1]));
+
+        addPercept(agName, pa);
+        modelo.setAgPosByName(agName, agentGridPosition[0], agentGridPosition[1]);
+
+        //se agente com bola
+        if (agentGridPosition[0] == ballGridPosition[0] && agentGridPosition[1] == ballGridPosition[1]) {
+
+            addPercept(agName, COM_BOLA);
+        }
+
+        //se bola nao dominada
+        if (modelo.isFree(ballGridPosition[0], ballGridPosition[1])) {
+            addPercept(NAO_DOMINADA);
+        } else {
+            this.removePercept(NAO_DOMINADA);
+        }
+
+
+
+
+
     }
 
     /**
@@ -194,202 +242,27 @@ public class SoccerEnv extends Environment {
 
         clientProxy.setPlayerDribble(agName, Boolean.TRUE);
 
-        //cria um objeto jogador com os atributos de goleiro
-        Jogador novoJogador = new Jogador(position.getX(), position.getY());
-        novoJogador.setNome(agName);
-        novoJogador.setPosicaoDesejada(position);
+        //cria um objeto jogador
+        this.getJogadorByName(agName).setNome(agName);
+        this.getJogadorByName(agName).setPosicaoDesejada(position);
 
-        synchronized (jogadores) {
-            jogadores.add(novoJogador);
-        }
+
 
 
     }
 
-    /**
-     * Método que faz o robo rotacionar para determinado angulo
-     * @param anguloDesejado angulo desejado
-     * @param cliente cliente do simulador
-     * @param id identificador do jogador
-     * @throws Exception
-     */
-    private void rotacionar(double anguloDesejado, Player cliente, String id) throws Exception {
-
-        RobotInformation p1 = cliente.getPlayerInformation(id);
-
-        double atual = p1.getAngle() / Math.PI * 180;
-        double totalAvirarHorario = anguloDesejado - atual;
-        double totalAvirarAntiHorario = 360 - totalAvirarHorario;
-        double totalAvirar = Math.abs(totalAvirarAntiHorario) < Math.abs(totalAvirarHorario) ? totalAvirarAntiHorario : totalAvirarHorario;
-
-        if (Math.abs(totalAvirar) >= 0.05) {
-            cliente.setPlayerRotationVelocity(id, totalAvirar * KP_ROTACIONAR);
-            atual = p1.getAngle();
+    private Jogador getJogadorByName(String name) {
+        if (name.equals("goleiro")) {
+            return SoccerEnv.goleiro;
+        } else if (name.equals("atacanteMeio")) {
+            return SoccerEnv.atacanteMeio;
+        } else if (name.equals("atacanteDireita")) {
+            return SoccerEnv.atacanteDireita;
+        } else if (name.equals("atacanteEsquerda")) {
+            return SoccerEnv.atacanteEsquerda;
         } else {
-            cliente.setPlayerRotationVelocity(id, 0.0);
+            return null;
         }
-    }
 
-    /**
-     * Método que faz o robô rotacionar para determinado ponto
-     * @param p
-     * @param cliente
-     * @param id
-     * @return
-     * @throws Exception
-     */
-    private double rotacionarParaPonto(Point p, Player cliente, String id) throws Exception {
-
-        RobotInformation p1 = cliente.getPlayerInformation(id);
-        Point posJog = p1.getPosition();
-
-        Double rX = p.getX() - posJog.getX();
-        Double rY = p.getY() - posJog.getY();
-
-        double ang = (Math.atan2(rY, rX) / Math.PI * 180);
-        double angB = p1.getAngle() / Math.PI * 180;
-        System.out.println(ang + " - " + angB);
-        rotacionar(ang, cliente, id);
-
-        return ang;
-
-    }
-
-    /**
-     * Atualiza as percepções do agente passado como parâmetro
-     * @param agName nome do agente a atualizar as percepções
-     */
-    private void updateAgPercept(String agName) {
-        clearPercepts(agName);
-
-        //atualiza posicao da bola
-        Point ballPosition = clientProxy.getBallInformation().getPosition();
-        int ballGridPosition[] = FieldModel.toJasonPosition(ballPosition);
-
-        Literal p = ASSyntax.createLiteral("posBola",
-                ASSyntax.createNumber(ballGridPosition[0]),
-                ASSyntax.createNumber(ballGridPosition[1]));
-        addPercept(agName, p);
-
-
-        //atualiza a posicao do agente
-        Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
-        int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
-        Literal pa = ASSyntax.createLiteral("posicao",
-                ASSyntax.createNumber(agentGridPosition[0]),
-                ASSyntax.createNumber(agentGridPosition[1]));
-        
-        addPercept(agName, pa);
-    }
-
-    /**
-     * Método que faz com que o robo vá para uma posição desejada
-     * @param cliente Cliente do simulador
-     * @param j jogador
-     * @throws Exception
-     */
-    public static void irLinhaReta(Player cliente, Jogador j) throws Exception {
-
-        RobotInformation p1 = cliente.getPlayerInformation(j.getNome());
-        //posicao do jogador
-        Point posJog = p1.getPosition();
-        //posição desejada
-        Point p = j.getPosicaoDesejada();
-
-        System.out.println("Posição: " + posJog.getY() + " - " + p.getY());
-
-        //se na estiver no ponto desejado
-
-
-
-
-        if (posJog != p) {
-
-            //controle PID
-
-            //diferença entre a posicao desejada e a atual
-            Double rX = p.getX() - posJog.getX();
-            Double rY = p.getY() - posJog.getY();
-
-            //zera os erros mínimos
-
-
-
-
-            if (Math.abs(rX) < ERRO_MIN) {
-                rX = 0.0;
-
-
-
-
-            }
-            if (Math.abs(rY) < ERRO_MIN) {
-                rY = 0.0;
-
-
-
-
-            } //Integral
-            double iX = dt * kI * ((rX + j.getXErro()) / 2 + j.getiXAnt());
-
-
-
-
-            double iY = dt * kI * ((rY + j.getYErro()) / 2 + j.getiYAnt());
-
-            //Proporcional
-
-
-
-
-            double pX = rX * kP;
-
-
-
-
-            double pY = rY * kP;
-
-            //Derivativo
-
-
-
-
-            double dX = kD * (rX - j.getXErro()) / dt;
-
-
-
-
-            double dY = kD * (rY - j.getYErro()) / dt;
-
-            //velocidade em x
-
-
-
-
-            double vX = pX + iX + dX;
-            //velocidade em y
-
-
-
-
-            double vY = pY + iY + dY;
-
-            //redefine os atributos do jogador
-            j.setvXAnterior(vX);
-            j.setvYAnterior(vY);
-
-            j.setiYAnt((rY + j.getYErro()) / 2 + j.getiYAnt());
-            j.setiXAnt((rX + j.getXErro()) / 2 + j.getiXAnt());
-
-            j.setXErro(rX);
-            j.setYErro(rY);
-
-            //define os vetores velocidade do jogador
-            cliente.setPlayerVelocity(j.getNome(), vX, vY);
-            System.out.println("Vx: " + vX);
-            System.out.println("Vy: " + vY);
-
-
-        }
     }
 }
