@@ -288,8 +288,13 @@ public class SoccerEnv extends Environment {
 
     }
 
-    private String verificaJogadorMaisProximoDaBola() {
+    /**
+     * Método privado que verifica qual dos jogadores está mais próximo da bola
+     * @return <code>String</code> contendo o nome do jogador mais próximo da bola
+     */
+    private synchronized String verificaJogadorMaisProximoDaBola() {
         String nomeJogador = null;
+
         Point posBola = clientProxy.getBallInformation().getPosition();
         Point posGoleiro = clientProxy.getPlayerInformation(SoccerEnv.goleiro.getNome()).getPosition();
         Point posAtacanteM = clientProxy.getPlayerInformation(SoccerEnv.atacanteMeio.getNome()).getPosition();

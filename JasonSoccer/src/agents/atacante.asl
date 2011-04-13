@@ -17,16 +17,23 @@
 //caso o atacante seja o jogador mais proximo da bola e ela não 
 //estiver sob a posse de nenhum outro jogador, então domine a bola
 +!atacar: naoDominada(bola) & maisPerto(bola)
-	<- !!olheBola; 
-	?posBola(X,Y);
-	irLinhaReta(X,Y);
-	!atacar.
+	<-	!!olheBola; 
+		?posBola(X,Y);
+		irLinhaReta(X,Y);
+		!atacar.
+
+//caso contrário reposiciona
++!atacar: true
+	<- 	!!olheBola; 
+		?posicaoIni(X,Y);
+		irLinhaReta(X,Y);
+		!atacar.
 	   
 
 	
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
-	<- ?posBola(X,Y);
+	<- 	?posBola(X,Y);
 		rotacioneParaBola(X,Y).
 		
 		
