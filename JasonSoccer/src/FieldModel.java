@@ -37,14 +37,16 @@ public class FieldModel extends GridWorldModel {
     }
 
     public void setAgPosByName(String name, int x, int y) {
-        if (name.equals("goleiro")) {
-            this.setAgPos(GOLEIRO_ADVERSARIO, x, y);
-        } else if (name.equals("atacanteMeio")) {
-            this.setAgPos(ATACANTE_MEIO, x, y);
-        } else if (name.equals("atacanteDireita")) {
-            this.setAgPos(ATACANTE_DIREITA, x, y);
-        } else if (name.equals("atacanteEsquerda")) {
-            this.setAgPos(ATACANTE_ESQUERDA, x, y);
+        if (x < 25 && y < 17) {
+            if (name.equals("goleiro")) {
+                this.setAgPos(GOLEIRO_ADVERSARIO, x, y);
+            } else if (name.equals("atacanteMeio")) {
+                this.setAgPos(ATACANTE_MEIO, x, y);
+            } else if (name.equals("atacanteDireita")) {
+                this.setAgPos(ATACANTE_DIREITA, x, y);
+            } else if (name.equals("atacanteEsquerda")) {
+                this.setAgPos(ATACANTE_ESQUERDA, x, y);
+            }
         }
     }
 

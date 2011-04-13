@@ -17,14 +17,14 @@
 //caso o atacante seja o jogador mais proximo da bola e ela não 
 //estiver sob a posse de nenhum outro jogador, então domine a bola
 +!atacar: naoDominada(bola) & maisPerto(bola)
-	<-	!!olheBola; 
+	<-	!!posChute; 
 		?posBola(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
 		
-//se proximo do gol e com a bola, chute ao gol
+//se com a bola, calcule melhor posicao para chute ao gol
 +!atacar: com(bola) 
-	<- chuteAoGol;
+	<- !melhorPosChute;
 	!atacar.
 
 //caso contrário reposiciona
@@ -42,7 +42,9 @@
 		rotacioneParaBola(X,Y).
 		
 		
-
++!melhorPosChute : true
+	<- posicaoChute.
+	
 		
 
 

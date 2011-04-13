@@ -81,7 +81,7 @@ RULEBLOCK No1
     RULE 11 : IF pos_goleiro IS direita AND pos_jogador IS centro
                 THEN pos_chute IS esquerda;
     RULE 12 : IF pos_goleiro IS direita AND pos_jogador IS direita
-                THEN pos_chute IS esquerda;
+                THEN pos_chute IS mto_esquerda;
     //goleiro mto_direita
     RULE 13 : IF pos_goleiro IS direita AND pos_jogador IS esquerda
                 THEN pos_chute IS esquerda;

@@ -58,6 +58,7 @@ public class SoccerEnv extends Environment {
     private static final String DEFENDER_GOL = "defender";
     private static final Literal CHUTAR = Literal.parseLiteral("chutar");
     private static final Literal CHUTE_AO_GOL = Literal.parseLiteral("chuteAoGol");
+    private static final Literal POSICAO_CHUTE = Literal.parseLiteral("posicaoChute");
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -133,9 +134,9 @@ public class SoccerEnv extends Environment {
             if (action.equals(CHUTAR)) {
                 clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
             }
-            if (action.equals(CHUTE_AO_GOL)) {
+            if (action.equals(POSICAO_CHUTE)) {
 
-                this.atacar(agName, action);
+                this.melhorPosChute(agName, action);
             }
 
 
@@ -290,7 +291,7 @@ public class SoccerEnv extends Environment {
 
     }
 
-    private synchronized void atacar(String agName, Structure action) throws Exception {
+    private synchronized void melhorPosChute(String agName, Structure action) throws Exception {
         Fuzzy f = new Fuzzy();
         //posicao do jogador
         Point posJog = clientProxy.getPlayerInformation(agName).getPosition();
