@@ -1,0 +1,16 @@
+\select@language {brazil}
+\contentsline {chapter}{\numberline {1}Introdu\c c\~ao}{3}
+\contentsline {section}{\numberline {1.1}Objetivos}{3}
+\contentsline {chapter}{\numberline {2}Ambiente}{4}
+\contentsline {section}{\numberline {2.1}Descri\c c\~ao do Ambiente}{4}
+\contentsline {chapter}{\numberline {3}Agentes}{5}
+\contentsline {section}{\numberline {3.1}Movimentos Poss\IeC {\'\i }veis}{5}
+\contentsline {section}{\numberline {3.2}Cren\c cas Iniciais}{6}
+\contentsline {section}{\numberline {3.3}A\c c\~oes Poss\IeC {\'\i }veis}{7}
+\contentsline {subsection}{\numberline {3.3.1}Atacante}{7}
+\contentsline {subsection}{\numberline {3.3.2}Goleiro}{8}
+\contentsline {chapter}{\numberline {4}Tewnta e Jason}{9}
+\contentsline {section}{\numberline {4.1}C\'odigo Jason}{9}
+\contentsline {section}{\numberline {4.2}C\'odigo Java/Tewnta}{9}
+\contentsline {chapter}{\numberline {5}Conclus\~ao}{11}
+\contentsline {chapter}{Refer\^encias}{12}

@@ -5,8 +5,6 @@ import java.util.logging.*;
 import br.ufrgs.f180.api.Player;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -47,15 +45,15 @@ public class SoccerEnv extends Environment {
      * Modelo do campo
      */
     private static FieldModel modelo = null;
-    /* Ações */
-    private static final Term TERM_GIRE = Literal.parseLiteral("gire");
-    private static final Literal PERTO_BOLA = Literal.parseLiteral("perto(bola)");
+    /*Percepcoes*/
     private static final Literal NAO_DOMINADA = Literal.parseLiteral("naoDominada(bola)");
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
+    /* Ações */
     private static final String CREATE_PLAYER = "createPlayer";
     private static final String ROTACIONE_PARA_BOLA = "rotacioneParaBola";
     private static final String IR_LINHA_RETA = "irLinhaReta";
     private static final String DEFENDER_GOL = "defender";
+    private static final Literal CHUTAR = Literal.parseLiteral("chutar");
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -118,47 +116,16 @@ public class SoccerEnv extends Environment {
                 MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
 
             }
-
             if (action.getFunctor().equals(DEFENDER_GOL)) {
 
-                Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
-                        Integer.parseInt(action.getTerm(1).toString()));
-                Point posGole = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(2).toString()),
-                        Integer.parseInt(action.getTerm(3).toString()));
-
-                double xIniGoleiro = FieldModel.toTewntaPosition(24, 0).getX();
-
-                //se a bola estiver acima da posicao do goleiro
-                if (posBola.getY() > posGole.getY()) {
-                    //se a bola estiver acima da trave do gol
-                    if (posBola.getY() > 230) {
-                        //goleiro fica na trave
-                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 229.0));
-                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
-                        //se a bola estiver dentro dos limites do gol
-                    } else {
-                        //goleiro se posiciona conforme bola
-                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
-                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
-                    }
-
-                    //se a bola estiver abaixo da posicao do goleiro
-                } else if (posBola.getY() <= posGole.getY()) {
-                    //se a bola estiver abaixo da trave do gol
-                    if (posBola.getY() < 170) {
-                        //goleiro fica na trave
-                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 171.0));
-                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
-                        //se a bola estiver dentro dos limites do gol
-                    } else {
-                        //goleiro se posiciona conforme bola
-                        this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
-                        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
-                    }
-                }
+                this.defender(agName, action);
+            }
+            if(action.equals(CHUTAR))
+            {
+                clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
             }
 
-            //logger.info("Ball position: ( " + newPosBola[0] + "," + newPosBola[1] + ")");
+
 
             Thread.sleep(100);
 
@@ -212,8 +179,6 @@ public class SoccerEnv extends Environment {
         //se bola nao dominada
         if (modelo.isFree(ballGridPosition[0], ballGridPosition[1])) {
             addPercept(NAO_DOMINADA);
-        } else {
-            this.removePercept(NAO_DOMINADA);
         }
 
 
@@ -245,9 +210,45 @@ public class SoccerEnv extends Environment {
         //cria um objeto jogador
         this.getJogadorByName(agName).setNome(agName);
         this.getJogadorByName(agName).setPosicaoDesejada(position);
+    }
 
+    private void defender(String agName, Structure action) throws Exception {
 
+        Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
+                Integer.parseInt(action.getTerm(1).toString()));
+        Point posGole = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(2).toString()),
+                Integer.parseInt(action.getTerm(3).toString()));
 
+        double xIniGoleiro = FieldModel.toTewntaPosition(24, 0).getX();
+
+        //se a bola estiver acima da posicao do goleiro
+        if (posBola.getY() > posGole.getY()) {
+            //se a bola estiver acima da trave do gol
+            if (posBola.getY() > 230) {
+                //goleiro fica na trave
+                this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 229.0));
+                MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+                //se a bola estiver dentro dos limites do gol
+            } else {
+                //goleiro se posiciona conforme bola
+                this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
+                MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+            }
+
+            //se a bola estiver abaixo da posicao do goleiro
+        } else if (posBola.getY() <= posGole.getY()) {
+            //se a bola estiver abaixo da trave do gol
+            if (posBola.getY() < 170) {
+                //goleiro fica na trave
+                this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, 171.0));
+                MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+                //se a bola estiver dentro dos limites do gol
+            } else {
+                //goleiro se posiciona conforme bola
+                this.getJogadorByName(agName).setPosicaoDesejada(new Point(xIniGoleiro, posBola.getY()));
+                MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+            }
+        }
 
     }
 

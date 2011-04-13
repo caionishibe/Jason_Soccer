@@ -1,0 +1,31 @@
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{1.45.2.1 }
+
+\bibitem[Bordini, H{\"u}bner e Wooldridge 2007]{agentspeak}
+\abntrefinfo{Bordini, H{\"u}bner e Wooldridge}{BORDINI; H{\"U}BNER;
+  WOOLDRIDGE}{2007}
+{BORDINI, R.~H.; H{\"U}BNER, J.~F.; WOOLDRIDGE, M. \emph{Programming
+  Multi-Agent Systems in AgentSpeak using Jason}. [S.l.]: Wiley, 2007.}
+
+\bibitem[Coelho 2008]{helder}
+\abntrefinfo{Coelho}{COELHO}{2008}
+{COELHO, H. \emph{Teoria da Ag{\^e}ncia: Arquitectura e Cenografia}. [S.l.]:
+  LabMAg e ICC, FCUL, 2008.}
+
+\bibitem[Detoni 2008]{tewnta}
+\abntrefinfo{Detoni}{DETONI}{2008}
+{DETONI, G.~G. \emph{tewnta: Robocup Small Size League (SSL) F180 Simulator}.
+  2008.
+Dispon{\'\i}vel em: $<$\url{http://code.google.com/p/tewnta/}$>$.}
+
+\bibitem[H{\"u}bner e Bordini 2010]{jason}
+\abntrefinfo{H{\"u}bner e Bordini}{H{\"U}BNER; BORDINI}{2010}
+{H{\"U}BNER, J.~F.; BORDINI, R.~H. \emph{Jason: a Java-based interpreter for an
+  extended version of AgentSpeak}. 2010.
+Dispon{\'\i}vel em: $<$\url{http://jason.sourceforge.net/Jason/Jason.html}$>$.}
+
+\end{thebibliography}

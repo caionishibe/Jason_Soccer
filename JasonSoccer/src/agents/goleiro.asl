@@ -24,6 +24,11 @@ time(team_b).
 	   
 //Após criado o goleiro, inicia-se o plano de defesa.
 
+//caso o goleiro esteja com a bola, chutar
++!defender : com(bola)
+	<- chutar;
+	!defender.
+
 //caso contrário
 +!defender : true
 	<- 	?posBola(XBola,YBola);
