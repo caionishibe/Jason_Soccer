@@ -17,7 +17,7 @@ import javax.xml.ws.Service;
  */
 public class SoccerEnv extends Environment {
 
-    private Logger logger = Logger.getLogger("tewntajason.mas2j." + SoccerEnv.class.getName());
+    public static final Logger logger = Logger.getLogger("tewntajason.mas2j." + SoccerEnv.class.getName());
     /**
      * Número de agentes no ambiente
      */
@@ -50,17 +50,21 @@ public class SoccerEnv extends Environment {
     private static final Literal NAO_DOMINADA = Literal.parseLiteral("naoDominada(bola)");
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
     private static final Literal MAIS_PERTO_BOLA = Literal.parseLiteral("maisPerto(bola)");
+    private static final Literal PERTO_GOL = Literal.parseLiteral("perto(gol)");
     /* Ações */
     private static final String CREATE_PLAYER = "createPlayer";
     private static final String ROTACIONE_PARA_BOLA = "rotacioneParaBola";
     private static final String IR_LINHA_RETA = "irLinhaReta";
     private static final String DEFENDER_GOL = "defender";
     private static final Literal CHUTAR = Literal.parseLiteral("chutar");
+    private static final Literal CHUTE_AO_GOL = Literal.parseLiteral("chuteAoGol");
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
     private static final Jogador atacanteDireita = new Jogador(0, 0);
     private static final Jogador atacanteEsquerda = new Jogador(0, 0);
+    /*Outras constantes*/
+    public static final int posXGoleiro = 24;
 
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
@@ -91,7 +95,11 @@ public class SoccerEnv extends Environment {
     public boolean executeAction(String agName, Structure action) {
 
         if (!(action.getFunctor().equals(CREATE_PLAYER))) {
-            this.updateAgPercept(agName);
+            try {
+                this.updateAgPercept(agName);
+            } catch (Exception ex) {
+                Logger.getLogger(SoccerEnv.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         try {
@@ -125,6 +133,11 @@ public class SoccerEnv extends Environment {
             if (action.equals(CHUTAR)) {
                 clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
             }
+            if (action.equals(CHUTE_AO_GOL)) {
+
+                this.atacar(agName, action);
+            }
+
 
 
 
@@ -147,7 +160,7 @@ public class SoccerEnv extends Environment {
      * Atualiza as percepções do agente passado como parâmetro
      * @param agName nome do agente a atualizar as percepções
      */
-    private void updateAgPercept(String agName) {
+    private void updateAgPercept(String agName) throws Exception {
         this.clearPercepts(agName);
 
         //atualiza posicao da bola
@@ -184,12 +197,21 @@ public class SoccerEnv extends Environment {
 
         }
 
+        //se próximo ao gol
+        if (agentGridPosition[0] >= 17) {
+            addPercept(agName, PERTO_GOL);
+            clientProxy.setPlayerKick(agName, 50.0);
+        }
+
 
         //adiciona percepcao ao jogador mais proximo da bola
         String jogadorMaisProximoDaBola = this.verificaJogadorMaisProximoDaBola();
         if (agName.equals(jogadorMaisProximoDaBola)) {
             addPercept(agName, MAIS_PERTO_BOLA);
         }
+
+
+
 
 
 
@@ -228,14 +250,14 @@ public class SoccerEnv extends Environment {
      * @param action Acao
      * @throws Exception
      */
-    private void defender(String agName, Structure action) throws Exception {
+    private synchronized void defender(String agName, Structure action) throws Exception {
 
         Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
                 Integer.parseInt(action.getTerm(1).toString()));
         Point posGole = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(2).toString()),
                 Integer.parseInt(action.getTerm(3).toString()));
 
-        double xIniGoleiro = FieldModel.toTewntaPosition(24, 0).getX();
+        double xIniGoleiro = FieldModel.toTewntaPosition(SoccerEnv.posXGoleiro, 0).getX();
 
         //se a bola estiver acima da posicao do goleiro
         if (posBola.getY() > posGole.getY()) {
@@ -268,6 +290,23 @@ public class SoccerEnv extends Environment {
 
     }
 
+    private synchronized void atacar(String agName, Structure action) throws Exception {
+        Fuzzy f = new Fuzzy();
+        //posicao do jogador
+        Point posJog = clientProxy.getPlayerInformation(agName).getPosition();
+        //posicao do goleiro
+        Point posGole = clientProxy.getPlayerInformation(SoccerEnv.goleiro.getNome()).getPosition();
+
+        //calculaChute o y de chute
+        double yChute = f.getPosChute(posGole.getY(), posJog.getY());
+        //chute
+        MetodosAuxiliares.rotacionarParaPonto(new Point(posGole.getX(), yChute), clientProxy, agName);
+        //clientProxy.setPlayerKick(agName, 50.0);
+
+
+
+    }
+
     /**
      * Método privado que retorna a instancia do jogador através do nome
      * @param name Nome do jogador
@@ -276,14 +315,24 @@ public class SoccerEnv extends Environment {
     private Jogador getJogadorByName(String name) {
         if (name.equals("goleiro")) {
             return SoccerEnv.goleiro;
+
+
         } else if (name.equals("atacanteMeio")) {
             return SoccerEnv.atacanteMeio;
+
+
         } else if (name.equals("atacanteDireita")) {
             return SoccerEnv.atacanteDireita;
+
+
         } else if (name.equals("atacanteEsquerda")) {
             return SoccerEnv.atacanteEsquerda;
+
+
         } else {
             return null;
+
+
         }
 
     }
@@ -301,24 +350,45 @@ public class SoccerEnv extends Environment {
         Point posAtacanteD = clientProxy.getPlayerInformation(SoccerEnv.atacanteDireita.getNome()).getPosition();
         Point posAtacanteE = clientProxy.getPlayerInformation(SoccerEnv.atacanteEsquerda.getNome()).getPosition();
 
+
+
         double distGoleiro = posGoleiro.distanceFrom(posBola);
+
+
         double distAtacanteM = posAtacanteM.distanceFrom(posBola);
+
+
         double distAtacanteD = posAtacanteD.distanceFrom(posBola);
+
+
         double distAtacanteE = posAtacanteE.distanceFrom(posBola);
+
+
 
         double distancias[] = {distGoleiro, distAtacanteM, distAtacanteD, distAtacanteE};
         Arrays.sort(distancias);
 
+
+
         if (distancias[0] == distGoleiro) {
             nomeJogador = SoccerEnv.goleiro.getNome();
+
+
         } else if (distancias[0] == distAtacanteM) {
             nomeJogador = SoccerEnv.atacanteMeio.getNome();
+
+
         } else if (distancias[0] == distAtacanteD) {
             nomeJogador = SoccerEnv.atacanteDireita.getNome();
+
+
         } else if (distancias[0] == distAtacanteE) {
             nomeJogador = SoccerEnv.atacanteEsquerda.getNome();
+
+
         }
 
         return nomeJogador;
+
     }
 }

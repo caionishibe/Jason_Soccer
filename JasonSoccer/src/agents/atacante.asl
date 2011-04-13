@@ -21,6 +21,11 @@
 		?posBola(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
+		
+//se proximo do gol e com a bola, chute ao gol
++!atacar: com(bola) 
+	<- chuteAoGol;
+	!atacar.
 
 //caso contrário reposiciona
 +!atacar: true
