@@ -12,17 +12,17 @@
 +!entrarEmCampo : true
     <-  ?posicaoIni(X,Y); ?time(Z);
        createPlayer(X, Y, Z);
-       !iniciaAtaque.
+       !atacar.
 	   
-//Plano que contem todos os subplanos executados para que a estrategia de ataque
-//seja cumprida. Inicialmente existe apenas dois subplanos possiveis: olheBola e
-//buscaBola. Porem serao adicionados durante o decorrer do trabalho os demais subplanos
-//como passe, chute etc.
-+!iniciaAtaque : true
-	<- !!buscaBola; 
-	   !olheBola;
-	   !iniciaAtaque.
-	
+//caso o atacante seja o jogador mais proximo da bola e ela não 
+//estiver sob a posse de nenhum outro jogador, então domine a bola
++!atacar: naoDominada(bola) & maisPerto(bola)
+	<- !!olheBola; 
+	?posBola(X,Y);
+	irLinhaReta(X,Y);
+	!atacar.
+	   
+
 	
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
@@ -30,10 +30,7 @@
 		rotacioneParaBola(X,Y).
 		
 		
-//Vai em direcao a posicao da bola se estiver perto mas nao estiver com a bola
-+!buscaBola :perto(bola) & not com(bola)
-	<- ?posBola(X,Y);
-		irLinhaReta(X,Y).
+
 		
 
 

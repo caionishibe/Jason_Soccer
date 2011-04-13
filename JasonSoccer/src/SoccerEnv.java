@@ -5,6 +5,7 @@ import java.util.logging.*;
 import br.ufrgs.f180.api.Player;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
+import java.util.Arrays;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -48,6 +49,7 @@ public class SoccerEnv extends Environment {
     /*Percepcoes*/
     private static final Literal NAO_DOMINADA = Literal.parseLiteral("naoDominada(bola)");
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
+    private static final Literal MAIS_PERTO_BOLA = Literal.parseLiteral("maisPerto(bola)");
     /* Ações */
     private static final String CREATE_PLAYER = "createPlayer";
     private static final String ROTACIONE_PARA_BOLA = "rotacioneParaBola";
@@ -120,8 +122,7 @@ public class SoccerEnv extends Environment {
 
                 this.defender(agName, action);
             }
-            if(action.equals(CHUTAR))
-            {
+            if (action.equals(CHUTAR)) {
                 clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
             }
 
@@ -178,7 +179,16 @@ public class SoccerEnv extends Environment {
 
         //se bola nao dominada
         if (modelo.isFree(ballGridPosition[0], ballGridPosition[1])) {
-            addPercept(NAO_DOMINADA);
+
+            addPercept(agName, NAO_DOMINADA);
+
+        }
+
+
+        //adiciona percepcao ao jogador mais proximo da bola
+        String jogadorMaisProximoDaBola = this.verificaJogadorMaisProximoDaBola();
+        if (agName.equals(jogadorMaisProximoDaBola)) {
+            addPercept(agName, MAIS_PERTO_BOLA);
         }
 
 
@@ -212,6 +222,12 @@ public class SoccerEnv extends Environment {
         this.getJogadorByName(agName).setPosicaoDesejada(position);
     }
 
+    /**
+     * Método privado que modela a ação de defesa do goleiro
+     * @param agName Nome do agente
+     * @param action Acao
+     * @throws Exception
+     */
     private void defender(String agName, Structure action) throws Exception {
 
         Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
@@ -252,6 +268,11 @@ public class SoccerEnv extends Environment {
 
     }
 
+    /**
+     * Método privado que retorna a instancia do jogador através do nome
+     * @param name Nome do jogador
+     * @return Instância correspondente ao jogador
+     */
     private Jogador getJogadorByName(String name) {
         if (name.equals("goleiro")) {
             return SoccerEnv.goleiro;
@@ -265,5 +286,34 @@ public class SoccerEnv extends Environment {
             return null;
         }
 
+    }
+
+    private String verificaJogadorMaisProximoDaBola() {
+        String nomeJogador = null;
+        Point posBola = clientProxy.getBallInformation().getPosition();
+        Point posGoleiro = clientProxy.getPlayerInformation(SoccerEnv.goleiro.getNome()).getPosition();
+        Point posAtacanteM = clientProxy.getPlayerInformation(SoccerEnv.atacanteMeio.getNome()).getPosition();
+        Point posAtacanteD = clientProxy.getPlayerInformation(SoccerEnv.atacanteDireita.getNome()).getPosition();
+        Point posAtacanteE = clientProxy.getPlayerInformation(SoccerEnv.atacanteEsquerda.getNome()).getPosition();
+
+        double distGoleiro = posGoleiro.distanceFrom(posBola);
+        double distAtacanteM = posAtacanteM.distanceFrom(posBola);
+        double distAtacanteD = posAtacanteD.distanceFrom(posBola);
+        double distAtacanteE = posAtacanteE.distanceFrom(posBola);
+
+        double distancias[] = {distGoleiro, distAtacanteM, distAtacanteD, distAtacanteE};
+        Arrays.sort(distancias);
+
+        if (distancias[0] == distGoleiro) {
+            nomeJogador = SoccerEnv.goleiro.getNome();
+        } else if (distancias[0] == distAtacanteM) {
+            nomeJogador = SoccerEnv.atacanteMeio.getNome();
+        } else if (distancias[0] == distAtacanteD) {
+            nomeJogador = SoccerEnv.atacanteDireita.getNome();
+        } else if (distancias[0] == distAtacanteE) {
+            nomeJogador = SoccerEnv.atacanteEsquerda.getNome();
+        }
+
+        return nomeJogador;
     }
 }
