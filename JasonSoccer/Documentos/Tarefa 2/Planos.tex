@@ -223,43 +223,122 @@ Esta seção corresponde a fase dois da implementação de agentes no futebol de rob
 
 \section{Atacantes}
 
-TODO.
+\begin{quadro}[!h] 
+\begin{verbatim}
+// ao entrar em campo, obter a posicao inicial do jogador em campo e o 
+// time, criar o jogador no tewnta e comecar a rastrear a bola.
++!entrarEmCampo : true
+    <-  ?posicaoIni(X,Y); ?time(Z);
+       createPlayer(X, Y, Z);
+       !atacar.  
+//caso o atacante seja o jogador mais proximo da bola, então domine a bola
++!atacar: maisPerto(bola) & not com(bola)
+	<-	!!olheBola;
+		?posBola(X,Y);
+		irLinhaReta(X,Y);
+		!atacar.	
+//se sem bola e longe do gol, vá para perto do gol
++!atacar: not com(bola) & not perto(gol)
+	<- 	!!olheBola;
+		?posicao(X,Y);
+		?posicaoIni(A,B);
+		posicionaAtaque(420,B);
+		!atacar.		
+//se sem bola e perto do gol, posicao de ataque	
++!atacar: not com(bola) & perto(gol)
+	<-  !!olheBola;
+		?posicao(X,Y);
+		?posicaoIni(A,B);
+		posicionaAtaque(420,B);
+		!atacar.		
+//se com a bola e perto do gol, ache melhor posicao para chute
++!atacar: com(bola) & perto(gol)	
+	<- 	posicaoChute; 
+		!atacar.
+//se com a bola e longe do gol, passar para o companheiro mais proximo.
++!atacar: com(bola) & not perto(gol)
+	<-!!olharCompanheiro;
+		passar;
+		!atacar.
+//caso contrário reposiciona
++!atacar: true
+	<- 	//!!olheBola; 
+		?posicaoIni(X,Y);
+		irLinhaReta(X,Y);
+		!atacar.	   
+//Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
++!olheBola : true
+	<- 	?posBola(X,Y);
+		rotacionePara(X,Y).
+//Olha para o companheiro mais proximo		
++!olharCompanheiro:true
+	<- 	?companheiroMaisProximo(X,Y);
+		rotacionePara(X,Y).		
+		\end{verbatim}
+\caption{Código dos planos dos atacantes, em Jason}
+\label{cod-planos-atacantes}
+\end{quadro}
+
+O primeiro plano define que, sempre que \texttt{entrarEmCampo} entrar na base de objetivos do agente, a posição e a que time pertence serão resgatados da sua base de crenças, então será criado um jogador novo com estes parâmetros e o plano \texttt{defender} é chamado.
+
+O segundo plano leva em consideração duas percepções. Se o agente é o que está mais próximo da bola e não está com ela, então olha para bola, resgata da sua base de crenças a posição desta e vai em direção a ela para dominá-la.
+
+O terceiro plano leva em consideração duas percepções. Se o agente não está com a posse da bola e está longe do gol, então posicione-se próximo ao gol, utilizando sua base de crenças.
+
+O quarto plano leva em consideração duas percepções. Se o agente não está com a posse da bola e está próximo do gol, então permaneça na posição de ataque.
+
+O quinto plano leva em consideração duas percepções. Se o agente está com a posse da bola e próximo ao gol, então determine a melhor posição para chute, através de uma máquina de inferência Fuzzy.
+
+O sexto plano leva em consideração duas percepções. Se o agente está com a posse da bola, mas longe do gol, então passe para o agente mais próximo, desde que  seja do mesmo time.
+
+O sétimo plano funciona como plano \textit{default}. Sempre que o agente não encontrar um plano que contenha um contexto desejável, ele executará o plano de reposicionamento.
+
+O oitavo plano define que, sempre que \texttt{olheBola} entrar na base de objetivos do agente, a posição da bola é resgatada da sua base de crenças e este posiciona sua frente na direção da mesma.
+
+O nono plano define que, sempre que \texttt{olharCompanheiro} entrar na base de objetivos do agente, este rotacionará em direção a posição do agente mais próximo.
 
 \section{Goleiro}
 
 \begin{quadro}[!h] 
 \begin{verbatim}
-defender: naoDominada(bola) & maisPerto(bola) & not com(bola)
-	<- ?posBola(X,Y);
-	irLinhaReta(X,Y);
-	!defender.
-
+// Ao entrar em campo, obter a posicao inicial do jogador em campo,
+// criar o jogador no tewnta e iniciar a defesa.
++!entrarEmCampo : true
+    <- ?posicao(X, Y); ?time(Z);
+       createPlayer(X, Y,Z);
+	   !defender.
+	   
+//caso o goleiro esteja com a bola, chutar
 +!defender : com(bola)
-	<- chutar;
+	<- chutar(100);
 	!defender.
 
-defender: longe(bola)
-	<- avance;
-	!defender.
-
+//caso contrário, defenda o gol
 +!defender : true
 	<- 	?posBola(XBola,YBola);
 		?posicao(XGoleiro, YGoleiro);
 		!!olheBola;
 		defender(XBola, YBola, XGoleiro, YGoleiro); 
 		!defender.
-\end{verbatim}
+	   
+	   
+//Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
++!olheBola : true
+	<- ?posBola(X,Y);
+		rotacionePara(X,Y).
+		
+		\end{verbatim}
 \caption{Código dos planos do goleiro, em Jason}
 \label{cod-planos-goleiro}
 \end{quadro}
 
-O primeiro plano de ação leva em consideração três percepções. Se o agente não dominou, está próximo e não está de posse da bola, irá em direção a ela numa tentativa de defesa.
+O primeiro plano define que, sempre que \texttt{entrarEmCampo} entrar na base de objetivos do agente, a posição e a que time pertence serão resgatados da sua base de crenças, então será criado um jogador novo com estes parâmetros e o plano \texttt{defender} é chamado.
 
-O segundo plano define que se o agente está com a bola, no caso de uma defesa bem sucedida, por exemplo, deve chutar a bola para longe.
+O segundo plano leva em consideração uma percepção. Se o agente está de posse da bola, no caso de uma defesa bem sucedida, por exemplo, deve chutar a bola para longe.
 
-O terceiro plano define que se a bola está longe do agente, deve-se avançar uma pequena distância do gol de forma a aproximar-se dela.
+O terceiro plano, funciona como plano \textit{default}. Sempre que o agente não encontrar um plano que contenha um contexto desejável, ele executará o plano de defesa em si. O agente olha para bola e a partir da sua posição e da posição da bola, executa a manobra de defesa.
 
-O quarto e último plano define a ação principal de defesa, que consiste em obter a posição da bola, olhar para ela e executar a manobra de defesa.
+O quarto e último plano define que, sempre que \texttt{olheBola} entrar na base de objetivos do agente, a posição da bola é resgatada da sua base de crenças e este posiciona sua frente na direção da mesma.
 
 \chapter{Tewnta e Jason}
 
