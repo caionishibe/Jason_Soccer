@@ -28,6 +28,12 @@
 		posicionaAtaque(420,Y);
 		!atacar.
 		
++!atacar: not com(bola) & perto(gol)
+	<- !!olheBola;
+		?posicao(X,Y);
+		irLinhaReta(X,Y);
+		!atacar.
+		
 
 //se com a bola e perto do gol, chute
 +!atacar: com(bola) & perto(gol)	
