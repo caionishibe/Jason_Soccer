@@ -174,7 +174,11 @@ public class SoccerEnv extends Environment {
 
         //atualiza a posicao do agente
         Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
-        
+        double agentAngle = clientProxy.getPlayerInformation(agName).getAngle();
+        Point head = agentPosition.sum(new Point(10*Math.cos(agentAngle),10*Math.sin(agentAngle)));
+
+
+       
         Literal pa = ASSyntax.createLiteral("posicao",
                 ASSyntax.createNumber(agentPosition.getX()),
                 ASSyntax.createNumber(agentPosition.getY()));
@@ -183,13 +187,13 @@ public class SoccerEnv extends Environment {
         
 
         //se agente com bola
-        if (true) {
-
+        if(head.distanceFrom(ballPosition) < 5)
+        {
             addPercept(agName, COM_BOLA);
         }
 
         //se bola nao dominada
-        if (false) {
+        if (true) {
 
             addPercept(agName, NAO_DOMINADA);
 
