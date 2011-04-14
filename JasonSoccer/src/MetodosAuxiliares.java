@@ -62,6 +62,57 @@ public class MetodosAuxiliares {
     }
 
     /**
+     * Método que faz o robo rotacionar Lentamente para determinado angulo
+     * @param anguloDesejado angulo desejado
+     * @param cliente cliente do simulador
+     * @param id identificador do jogador
+     * @throws Exception
+     */
+    public static void rotacionarLentamente(double anguloDesejado, Player cliente, String id) throws Exception {
+
+        RobotInformation p1 = cliente.getPlayerInformation(id);
+
+        double atual = p1.getAngle() / Math.PI * 180;
+        double totalAvirarHorario = anguloDesejado - atual;
+        double totalAvirarAntiHorario = 360 - totalAvirarHorario;
+        double totalAvirar = Math.abs(totalAvirarAntiHorario) < Math.abs(totalAvirarHorario) ? totalAvirarAntiHorario : totalAvirarHorario;
+
+        if (Math.abs(totalAvirar) >= 0.05) {
+            cliente.setPlayerRotationVelocity(id, totalAvirar * (KP_ROTACIONAR/3));
+            atual = p1.getAngle();
+        } else {
+            cliente.setPlayerRotationVelocity(id, 0.0);
+        }
+    }
+
+
+        /**
+     * Método que faz o robô rotacionar para determinado ponto
+     * @param p
+     * @param cliente
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public static double rotacionarLentamenteParaPonto(Point p, Player cliente, String id) throws Exception {
+
+        RobotInformation p1 = cliente.getPlayerInformation(id);
+        Point posJog = p1.getPosition();
+
+        Double rX = p.getX() - posJog.getX();
+        Double rY = p.getY() - posJog.getY();
+
+        double ang = (Math.atan2(rY, rX) / Math.PI * 180);
+        double angB = p1.getAngle() / Math.PI * 180;
+        System.out.println(ang + " - " + angB);
+        rotacionarLentamente(ang, cliente, id);
+
+        return ang;
+
+    }
+
+
+    /**
      * Método que faz o robô rotacionar para determinado ponto
      * @param p
      * @param cliente

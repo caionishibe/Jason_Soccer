@@ -110,7 +110,7 @@ public class SoccerEnv extends Environment {
             if (action.getFunctor().equals(ROTACIONE_PARA_BOLA)) {
                 Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
                         Double.parseDouble(action.getTerm(1).toString()));
-                MetodosAuxiliares.rotacionarParaPonto(posBola, clientProxy, agName);
+                MetodosAuxiliares.rotacionarLentamenteParaPonto(posBola, clientProxy, agName);
             }
             if (action.getFunctor().equals(IR_LINHA_RETA)) {
                 Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),

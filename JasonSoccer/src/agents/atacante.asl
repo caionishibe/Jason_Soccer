@@ -18,6 +18,7 @@
 //estiver sob a posse de nenhum outro jogador, então domine a bola
 +!atacar: naoDominada(bola) & maisPerto(bola)
 	<-	!!posChute; 
+		!!olheBola;
 		?posBola(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
