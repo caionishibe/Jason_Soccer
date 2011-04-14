@@ -7,3 +7,4 @@ time(team_a).
 
 //Inclui os comportamentos de um atacante
 { include("atacante.asl") }
+

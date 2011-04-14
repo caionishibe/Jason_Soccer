@@ -55,7 +55,7 @@ public class SoccerEnv extends Environment {
     private static final String DEFENDER_GOL = "defender";
     private static final Literal CHUTAR = Literal.parseLiteral("chutar");
     private static final Literal POSICAO_CHUTE = Literal.parseLiteral("posicaoChute");
-    private static final Literal POSICIONA_ATAQUE = Literal.parseLiteral("posicionaAtaque");
+    private static final String POSICIONA_ATAQUE = "posicionaAtaque";
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -63,7 +63,7 @@ public class SoccerEnv extends Environment {
     private static final Jogador atacanteEsquerda = new Jogador(0, 0);
     /*Outras constantes*/
     public static final int posXGoleiro = 510;
-
+    
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
     public void init(String[] args) {
@@ -131,9 +131,8 @@ public class SoccerEnv extends Environment {
 
                 this.melhorPosChute(agName, action);
             }
-            if(action.equals(POSICIONA_ATAQUE))
-            {
-                this.posicionaAtaque(agName,action);
+            if (action.getFunctor().equals(POSICIONA_ATAQUE)) {
+                this.posicionaAtaque(agName, action, Double.parseDouble(action.getTerm(0).toString()),Double.parseDouble(action.getTerm(1).toString()));
             }
 
 
@@ -163,7 +162,7 @@ public class SoccerEnv extends Environment {
 
         //atualiza posicao da bola
         Point ballPosition = clientProxy.getBallInformation().getPosition();
-       
+
 
         Literal p = ASSyntax.createLiteral("posBola",
                 ASSyntax.createNumber(ballPosition.getX()),
@@ -175,29 +174,23 @@ public class SoccerEnv extends Environment {
         //atualiza a posicao do agente
         Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
         double agentAngle = clientProxy.getPlayerInformation(agName).getAngle();
-        Point head = agentPosition.sum(new Point(10*Math.cos(agentAngle),10*Math.sin(agentAngle)));
+        Point head = agentPosition.sum(new Point(10 * Math.cos(agentAngle), 10 * Math.sin(agentAngle)));
 
 
-       
+
         Literal pa = ASSyntax.createLiteral("posicao",
                 ASSyntax.createNumber(agentPosition.getX()),
                 ASSyntax.createNumber(agentPosition.getY()));
 
         addPercept(agName, pa);
-        
+
 
         //se agente com bola
-        if(head.distanceFrom(ballPosition) < 5)
-        {
+        if (head.distanceFrom(ballPosition) < 5) {
             addPercept(agName, COM_BOLA);
         }
 
-        //se bola nao dominada
-        if (true) {
 
-            addPercept(agName, NAO_DOMINADA);
-
-        }
 
         //se próximo ao gol
         if (agentPosition.getX() >= 400.0) {
@@ -309,13 +302,10 @@ public class SoccerEnv extends Environment {
 
     }
 
-    private synchronized void posicionaAtaque(String agName, Structure action) throws Exception {
-
-       int xAtaque = 17 + (int)(Math.random() * ((24 - 17) + 1));
-       int yAtaque = (int)(Math.random()*16);
-
-
-       MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+    private synchronized void posicionaAtaque(String agName, Structure action, double x, double y) throws Exception {
+        
+        this.getJogadorByName(agName).setPosicaoDesejada(new Point(x, y));
+        MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
 
     }
 

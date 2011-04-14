@@ -14,13 +14,18 @@
        createPlayer(X, Y, Z);
        !atacar.
 	   
-//caso o atacante seja o jogador mais proximo da bola e ela não 
-//estiver sob a posse de nenhum outro jogador, então domine a bola
-+!atacar: naoDominada(bola) & maisPerto(bola)
-	<-	!!posChute; 
-		!!olheBola;
+//caso o atacante seja o jogador mais proximo da bola, então domine a bola
++!atacar: maisPerto(bola)
+	<-	!!olheBola;
 		?posBola(X,Y);
 		irLinhaReta(X,Y);
+		!atacar.
+		
+
++!atacar: not com(bola) & not perto(gol)
+	<- 	!!olheBola;
+		?posicao(X,Y);
+		posicionaAtaque(420,Y);
 		!atacar.
 		
 
@@ -33,7 +38,7 @@
 //caso contrário reposiciona
 +!atacar: true
 	<- 	!!olheBola; 
-		?posicaoIni(X,Y);
+		?posicao(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
 	   
