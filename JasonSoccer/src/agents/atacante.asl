@@ -15,42 +15,46 @@
        !atacar.
 	   
 //caso o atacante seja o jogador mais proximo da bola, então domine a bola
-+!atacar: maisPerto(bola)
++!atacar: maisPerto(bola) & not com(bola)
 	<-	!!olheBola;
 		?posBola(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
-		
+	
 //se sem bola e longe do gol, vá para perto do gol
 +!atacar: not com(bola) & not perto(gol)
 	<- 	!!olheBola;
 		?posicao(X,Y);
-		posicionaAtaque(420,Y);
+		?posicaoIni(A,B);
+		posicionaAtaque(420,B);
 		!atacar.
 		
-//se sem bola e perto do gol, fique onde está	
+//se sem bola e perto do gol, posicao de ataque	
 +!atacar: not com(bola) & perto(gol)
-	<- !!olheBola;
+	<-  !!olheBola;
 		?posicao(X,Y);
-		irLinhaReta(X,Y);
+		?posicaoIni(A,B);
+		posicionaAtaque(420,B);
 		!atacar.
 		
 
-//se com a bola e perto do gol, chute
+//se com a bola e perto do gol, ache melhor posicao para chute
 +!atacar: com(bola) & perto(gol)	
-	<- 	!!melhorPosChute; 
-		chutar(100);
+	<- 	posicaoChute; 
 		!atacar.
+
+
 
 //se com a bola e longe do gol, passar para o companheiro mais proximo.
 +!atacar: com(bola) & not perto(gol)
-	<-	!!olharCompanheiro;
-		chutar(1);
+	<-	//!olharCompanheiro;
+		passar;
 		!atacar.
 	
+
 //caso contrário reposiciona
 +!atacar: true
-	<- 	!!olheBola; 
+	<- 	//!!olheBola; 
 		?posicaoIni(X,Y);
 		irLinhaReta(X,Y);
 		!atacar.
@@ -60,14 +64,11 @@
 	<- 	?posBola(X,Y);
 		rotacionePara(X,Y).
 		
-//decide melhor ponto do gol para chutar utilizando Fuzzy.
-+!melhorPosChute : true
-	<- posicaoChute.
-	
+
 
 +!olharCompanheiro:true
 	<- 	?companheiroMaisProximo(X,Y);
 		rotacionePara(X,Y).
-
+	
 
 

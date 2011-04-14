@@ -68,7 +68,7 @@ public class MetodosAuxiliares {
      * @param id identificador do jogador
      * @throws Exception
      */
-    public static void rotacionarLentamente(double anguloDesejado, Player cliente, String id) throws Exception {
+    public static double rotacionarLentamente(double anguloDesejado, Player cliente, String id) throws Exception {
 
         RobotInformation p1 = cliente.getPlayerInformation(id);
 
@@ -83,6 +83,8 @@ public class MetodosAuxiliares {
         } else {
             cliente.setPlayerRotationVelocity(id, 0.0);
         }
+
+        return Math.abs(totalAvirar);
     }
 
 

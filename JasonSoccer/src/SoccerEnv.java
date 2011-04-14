@@ -48,6 +48,7 @@ public class SoccerEnv extends Environment {
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
     private static final Literal MAIS_PERTO_BOLA = Literal.parseLiteral("maisPerto(bola)");
     private static final Literal PERTO_GOL = Literal.parseLiteral("perto(gol)");
+    private static final Literal PRONTO_CHUTAR = Literal.parseLiteral("pronto(chutar)");
 
     /* Ações */
     private static final String CREATE_PLAYER = "createPlayer";
@@ -58,6 +59,7 @@ public class SoccerEnv extends Environment {
     private static final Literal POSICAO_CHUTE = Literal.parseLiteral("posicaoChute");
     private static final String POSICIONA_ATAQUE = "posicionaAtaque";
     private static final String OLHAR_COMPANHEIRO = "olharCompanheiro";
+    private static final Literal PASSAR = Literal.parseLiteral("passar");
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -101,7 +103,7 @@ public class SoccerEnv extends Environment {
         try {
 
 
-            logger.info(agName + " doing: " + action);
+            //logger.info(agName + " doing: " + action);
 
             if (action.getFunctor().equals(CREATE_PLAYER)) {
                 this.createPlayer(agName, action);
@@ -112,7 +114,7 @@ public class SoccerEnv extends Environment {
             if (action.getFunctor().equals(ROTACIONE_PARA)) {
                 Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
                         Double.parseDouble(action.getTerm(1).toString()));
-                MetodosAuxiliares.rotacionarLentamenteParaPonto(posBola, clientProxy, agName);
+                MetodosAuxiliares.rotacionarParaPonto(posBola, clientProxy, agName);
             }
             if (action.getFunctor().equals(IR_LINHA_RETA)) {
                 Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
@@ -127,20 +129,25 @@ public class SoccerEnv extends Environment {
                 this.defender(agName, action);
             }
             if (action.getFunctor().equals(CHUTAR)) {
-                clientProxy.setPlayerKick(agName, Double.parseDouble(action.getTerm(0).toString()));
             }
             if (action.equals(POSICAO_CHUTE)) {
 
                 this.melhorPosChute(agName, action);
+
+
             }
             if (action.getFunctor().equals(POSICIONA_ATAQUE)) {
                 this.posicionaAtaque(agName, action, Double.parseDouble(action.getTerm(0).toString()), Double.parseDouble(action.getTerm(1).toString()));
             }
-             if (action.getFunctor().equals(OLHAR_COMPANHEIRO)) {
+            if (action.getFunctor().equals(OLHAR_COMPANHEIRO)) {
                 double x = Double.parseDouble(action.getTerm(0).toString());
                 double y = Double.parseDouble(action.getTerm(1).toString());
 
-                MetodosAuxiliares.rotacionarParaPonto(new Point(x,y), clientProxy, agName);
+                MetodosAuxiliares.rotacionarParaPonto(new Point(x, y), clientProxy, agName);
+            }
+            if(action.equals(PASSAR))
+            {
+                this.passar(agName, 0.2);
             }
 
 
@@ -167,7 +174,7 @@ public class SoccerEnv extends Environment {
      */
     private void updateAgPercept(String agName) throws Exception {
         this.clearPercepts(agName);
-
+        
         //atualiza posicao da bola
         Point ballPosition = clientProxy.getBallInformation().getPosition();
 
@@ -194,15 +201,16 @@ public class SoccerEnv extends Environment {
 
 
         //se agente com bola
-        if (head.distanceFrom(ballPosition) < 5) {
+        if (head.distanceFrom(ballPosition) < 10) {
             addPercept(agName, COM_BOLA);
         }
 
 
 
         //se próximo ao gol
-        if (agentPosition.getX() >= 400.0) {
+        if (agentPosition.getX() >= 350.0) {
             addPercept(agName, PERTO_GOL);
+            clientProxy.setPlayerDribble(agName, Boolean.TRUE);
 
         }
 
@@ -247,7 +255,7 @@ public class SoccerEnv extends Environment {
             clientProxy.setPlayer(teamBIdentifier, agName, position.getX(), position.getY());
         }
 
-        clientProxy.setPlayerDribble(agName, Boolean.TRUE);
+        clientProxy.setPlayerDribble(agName, Boolean.FALSE);
 
         //cria um objeto jogador
         this.getJogadorByName(agName).setNome(agName);
@@ -310,7 +318,14 @@ public class SoccerEnv extends Environment {
         //calculaChute o y de chute
         double yChute = f.getPosChute(posGole.getY(), posJog.getY());
         //chute
-        MetodosAuxiliares.rotacionarParaPonto(new Point(posGole.getX(), yChute), clientProxy, agName);
+        double totalVirar = MetodosAuxiliares.rotacionarLentamenteParaPonto(new Point(posGole.getX(), yChute), clientProxy, agName);
+
+        if (totalVirar <= 0.05) {
+
+            clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
+
+        }
+
         //clientProxy.setPlayerKick(agName, 50.0);
 
 
@@ -456,5 +471,10 @@ public class SoccerEnv extends Environment {
 
         return maisProximo;
 
+    }
+
+    private synchronized void passar(String agName, double velocidade) throws Exception {
+        clientProxy.setPlayerDribble(agName, Boolean.FALSE);
+        clientProxy.setPlayerKick(agName, velocidade);
     }
 }

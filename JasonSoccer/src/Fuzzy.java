@@ -41,7 +41,7 @@ public class Fuzzy {
             fisChute.evaluate();
 
             posChute = fisChute.getVariable("pos_chute").defuzzify();
-            System.out.println("Chute em : "+posChute);
+            //System.out.println("Chute em : "+posChute);
         }
 
 
