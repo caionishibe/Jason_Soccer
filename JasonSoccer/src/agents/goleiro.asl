@@ -24,7 +24,7 @@ time(team_b).
 
 //caso o goleiro esteja com a bola, chutar
 +!defender : com(bola)
-	<- chutar;
+	<- chutar(100);
 	!defender.
 
 //caso contrário
@@ -39,7 +39,7 @@ time(team_b).
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- ?posBola(X,Y);
-		rotacioneParaBola(X,Y).
+		rotacionePara(X,Y).
 		
 
 		

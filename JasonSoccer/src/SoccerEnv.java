@@ -48,14 +48,16 @@ public class SoccerEnv extends Environment {
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
     private static final Literal MAIS_PERTO_BOLA = Literal.parseLiteral("maisPerto(bola)");
     private static final Literal PERTO_GOL = Literal.parseLiteral("perto(gol)");
+
     /* Ações */
     private static final String CREATE_PLAYER = "createPlayer";
-    private static final String ROTACIONE_PARA_BOLA = "rotacioneParaBola";
+    private static final String ROTACIONE_PARA = "rotacionePara";
     private static final String IR_LINHA_RETA = "irLinhaReta";
     private static final String DEFENDER_GOL = "defender";
-    private static final Literal CHUTAR = Literal.parseLiteral("chutar");
+    private static final String CHUTAR = "chutar";
     private static final Literal POSICAO_CHUTE = Literal.parseLiteral("posicaoChute");
     private static final String POSICIONA_ATAQUE = "posicionaAtaque";
+    private static final String OLHAR_COMPANHEIRO = "olharCompanheiro";
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -63,7 +65,7 @@ public class SoccerEnv extends Environment {
     private static final Jogador atacanteEsquerda = new Jogador(0, 0);
     /*Outras constantes*/
     public static final int posXGoleiro = 510;
-    
+
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
     public void init(String[] args) {
@@ -99,7 +101,7 @@ public class SoccerEnv extends Environment {
         try {
 
 
-            //logger.info(agName + " doing: " + action);
+            logger.info(agName + " doing: " + action);
 
             if (action.getFunctor().equals(CREATE_PLAYER)) {
                 this.createPlayer(agName, action);
@@ -107,7 +109,7 @@ public class SoccerEnv extends Environment {
                 this.updateAgPercept(agName);
 
             }
-            if (action.getFunctor().equals(ROTACIONE_PARA_BOLA)) {
+            if (action.getFunctor().equals(ROTACIONE_PARA)) {
                 Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
                         Double.parseDouble(action.getTerm(1).toString()));
                 MetodosAuxiliares.rotacionarLentamenteParaPonto(posBola, clientProxy, agName);
@@ -124,15 +126,21 @@ public class SoccerEnv extends Environment {
 
                 this.defender(agName, action);
             }
-            if (action.equals(CHUTAR)) {
-                clientProxy.setPlayerKick(agName, Double.MAX_VALUE);
+            if (action.getFunctor().equals(CHUTAR)) {
+                clientProxy.setPlayerKick(agName, Double.parseDouble(action.getTerm(0).toString()));
             }
             if (action.equals(POSICAO_CHUTE)) {
 
                 this.melhorPosChute(agName, action);
             }
             if (action.getFunctor().equals(POSICIONA_ATAQUE)) {
-                this.posicionaAtaque(agName, action, Double.parseDouble(action.getTerm(0).toString()),Double.parseDouble(action.getTerm(1).toString()));
+                this.posicionaAtaque(agName, action, Double.parseDouble(action.getTerm(0).toString()), Double.parseDouble(action.getTerm(1).toString()));
+            }
+             if (action.getFunctor().equals(OLHAR_COMPANHEIRO)) {
+                double x = Double.parseDouble(action.getTerm(0).toString());
+                double y = Double.parseDouble(action.getTerm(1).toString());
+
+                MetodosAuxiliares.rotacionarParaPonto(new Point(x,y), clientProxy, agName);
             }
 
 
@@ -204,6 +212,13 @@ public class SoccerEnv extends Environment {
         if (agName.equals(jogadorMaisProximoDaBola)) {
             addPercept(agName, MAIS_PERTO_BOLA);
         }
+
+        //define o jogador mais proximo
+        Point proximo = this.verificaJogadorMaisProximo(agName);
+        Literal proxA = ASSyntax.createLiteral("companheiroMaisProximo",
+                ASSyntax.createNumber(proximo.getX()),
+                ASSyntax.createNumber(proximo.getY()));
+        addPercept(agName, proxA);
 
 
 
@@ -303,7 +318,7 @@ public class SoccerEnv extends Environment {
     }
 
     private synchronized void posicionaAtaque(String agName, Structure action, double x, double y) throws Exception {
-        
+
         this.getJogadorByName(agName).setPosicaoDesejada(new Point(x, y));
         MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
 
@@ -394,6 +409,52 @@ public class SoccerEnv extends Environment {
         }
 
         return nomeJogador;
+
+    }
+
+    /**
+     * Método privado que verifica qual dos jogadores está mais próximo da bola
+     * @return <code>String</code> contendo o nome do jogador mais próximo da bola
+     */
+    private synchronized Point verificaJogadorMaisProximo(String agName) {
+        Point maisProximo = null;
+
+        Point posJog = clientProxy.getPlayerInformation(agName).getPosition();
+        Point posAtacanteM = clientProxy.getPlayerInformation(SoccerEnv.atacanteMeio.getNome()).getPosition();
+        Point posAtacanteD = clientProxy.getPlayerInformation(SoccerEnv.atacanteDireita.getNome()).getPosition();
+        Point posAtacanteE = clientProxy.getPlayerInformation(SoccerEnv.atacanteEsquerda.getNome()).getPosition();
+
+
+
+        double distAtacanteM = posAtacanteM.distanceFrom(posJog);
+
+
+        double distAtacanteD = posAtacanteD.distanceFrom(posJog);
+
+
+        double distAtacanteE = posAtacanteE.distanceFrom(posJog);
+
+
+
+        double distancias[] = {distAtacanteM, distAtacanteD, distAtacanteE};
+        Arrays.sort(distancias);
+
+
+        if (distancias[0] == distAtacanteM) {
+            maisProximo = posAtacanteM;
+
+
+        } else if (distancias[0] == distAtacanteD) {
+            maisProximo = posAtacanteD;
+
+
+        } else if (distancias[0] == distAtacanteE) {
+            maisProximo = posAtacanteE;
+
+
+        }
+
+        return maisProximo;
 
     }
 }

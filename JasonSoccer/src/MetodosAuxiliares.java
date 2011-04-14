@@ -104,7 +104,7 @@ public class MetodosAuxiliares {
 
         double ang = (Math.atan2(rY, rX) / Math.PI * 180);
         double angB = p1.getAngle() / Math.PI * 180;
-        System.out.println(ang + " - " + angB);
+        //System.out.println(ang + " - " + angB);
         rotacionarLentamente(ang, cliente, id);
 
         return ang;
@@ -130,7 +130,7 @@ public class MetodosAuxiliares {
 
         double ang = (Math.atan2(rY, rX) / Math.PI * 180);
         double angB = p1.getAngle() / Math.PI * 180;
-        System.out.println(ang + " - " + angB);
+       // System.out.println(ang + " - " + angB);
         rotacionar(ang, cliente, id);
 
         return ang;
@@ -151,7 +151,7 @@ public class MetodosAuxiliares {
         //posição desejada
         Point p = j.getPosicaoDesejada();
 
-        System.out.println("Posição: " + posJog.getY() + " - " + p.getY());
+        //System.out.println("Posição: " + posJog.getY() + " - " + p.getY());
 
         //se na estiver no ponto desejado
 
