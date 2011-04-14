@@ -6,7 +6,6 @@ import br.ufrgs.f180.api.Player;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Random;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -43,10 +42,7 @@ public class SoccerEnv extends Environment {
      * Identificador do time B
      */
     private static String teamBIdentifier;
-    /**
-     * Modelo do campo
-     */
-    private static FieldModel modelo = null;
+
     /*Percepcoes*/
     private static final Literal NAO_DOMINADA = Literal.parseLiteral("naoDominada(bola)");
     private static final Literal COM_BOLA = Literal.parseLiteral("com(bola)");
@@ -66,7 +62,7 @@ public class SoccerEnv extends Environment {
     private static final Jogador atacanteDireita = new Jogador(0, 0);
     private static final Jogador atacanteEsquerda = new Jogador(0, 0);
     /*Outras constantes*/
-    public static final int posXGoleiro = 24;
+    public static final int posXGoleiro = 510;
 
     /** Called before the MAS execution with the args informed in .mas2j */
     @Override
@@ -85,10 +81,6 @@ public class SoccerEnv extends Environment {
             logger.log(Level.SEVERE, null, ex);
             this.stop();
         }
-
-        //instancia o modelo do campo
-        modelo = new FieldModel(NUMBER_OF_AGENTS);
-
 
 
     }
@@ -116,13 +108,13 @@ public class SoccerEnv extends Environment {
 
             }
             if (action.getFunctor().equals(ROTACIONE_PARA_BOLA)) {
-                Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
-                        Integer.parseInt(action.getTerm(1).toString()));
+                Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
+                        Double.parseDouble(action.getTerm(1).toString()));
                 MetodosAuxiliares.rotacionarParaPonto(posBola, clientProxy, agName);
             }
             if (action.getFunctor().equals(IR_LINHA_RETA)) {
-                Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
-                        Integer.parseInt(action.getTerm(1).toString()));
+                Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
+                        Double.parseDouble(action.getTerm(1).toString()));
 
                 this.getJogadorByName(agName).setPosicaoDesejada(posBola);
                 MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
@@ -171,40 +163,40 @@ public class SoccerEnv extends Environment {
 
         //atualiza posicao da bola
         Point ballPosition = clientProxy.getBallInformation().getPosition();
-        int ballGridPosition[] = FieldModel.toJasonPosition(ballPosition);
+       
 
         Literal p = ASSyntax.createLiteral("posBola",
-                ASSyntax.createNumber(ballGridPosition[0]),
-                ASSyntax.createNumber(ballGridPosition[1]));
+                ASSyntax.createNumber(ballPosition.getX()),
+                ASSyntax.createNumber(ballPosition.getY()));
         addPercept(agName, p);
 
 
 
         //atualiza a posicao do agente
         Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
-        int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
+        
         Literal pa = ASSyntax.createLiteral("posicao",
-                ASSyntax.createNumber(agentGridPosition[0]),
-                ASSyntax.createNumber(agentGridPosition[1]));
+                ASSyntax.createNumber(agentPosition.getX()),
+                ASSyntax.createNumber(agentPosition.getY()));
 
         addPercept(agName, pa);
-        modelo.setAgPosByName(agName, agentGridPosition[0], agentGridPosition[1]);
+        
 
         //se agente com bola
-        if (agentGridPosition[0] == ballGridPosition[0] && agentGridPosition[1] == ballGridPosition[1]) {
+        if (true) {
 
             addPercept(agName, COM_BOLA);
         }
 
         //se bola nao dominada
-        if (modelo.isFree(ballGridPosition[0], ballGridPosition[1])) {
+        if (false) {
 
             addPercept(agName, NAO_DOMINADA);
 
         }
 
         //se próximo ao gol
-        if (agentGridPosition[0] >= 17) {
+        if (agentPosition.getX() >= 400.0) {
             addPercept(agName, PERTO_GOL);
 
         }
@@ -233,7 +225,7 @@ public class SoccerEnv extends Environment {
      */
     private void createPlayer(String agName, Structure action) throws Exception {
         //converte a posicao do grid para posicao do tewnta
-        Point position = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()), Integer.parseInt(action.getTerm(1).toString()));
+        Point position = new Point(Double.parseDouble(action.getTerm(0).toString()), Double.parseDouble(action.getTerm(1).toString()));
         //se o jogador for do time A
         if (action.getTerm(2).toString().equals("team_a")) {
             clientProxy.setPlayer(teamAIdentifier, agName, position.getX(), position.getY());
@@ -258,12 +250,12 @@ public class SoccerEnv extends Environment {
      */
     private synchronized void defender(String agName, Structure action) throws Exception {
 
-        Point posBola = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(0).toString()),
-                Integer.parseInt(action.getTerm(1).toString()));
-        Point posGole = FieldModel.toTewntaPosition(Integer.parseInt(action.getTerm(2).toString()),
-                Integer.parseInt(action.getTerm(3).toString()));
+        Point posBola = new Point(Double.parseDouble(action.getTerm(0).toString()),
+                Double.parseDouble(action.getTerm(1).toString()));
+        Point posGole = new Point(Double.parseDouble(action.getTerm(2).toString()),
+                Double.parseDouble(action.getTerm(3).toString()));
 
-        double xIniGoleiro = FieldModel.toTewntaPosition(SoccerEnv.posXGoleiro, 0).getX();
+        double xIniGoleiro = (SoccerEnv.posXGoleiro);
 
         //se a bola estiver acima da posicao do goleiro
         if (posBola.getY() > posGole.getY()) {

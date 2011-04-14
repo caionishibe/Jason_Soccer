@@ -2,7 +2,7 @@
 
 /* Initial beliefs and rules */
 
-posicaoIni(9, 8).
+posicaoIni(240, 200).
 time(team_a).
 
 //Inclui os comportamentos de um atacante
