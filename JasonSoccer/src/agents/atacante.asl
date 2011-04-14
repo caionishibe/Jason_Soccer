@@ -22,10 +22,12 @@
 		irLinhaReta(X,Y);
 		!atacar.
 		
-//se com a bola, calcule melhor posicao para chute ao gol
-+!atacar: com(bola) 
-	<- !melhorPosChute;
-	!atacar.
+
+//se com a bola e perto do gol, chute
++!atacar: com(bola) & perto(gol)	
+	<- 	!melhorPosChute; 
+		chutar;
+		!atacar.
 
 //caso contrário reposiciona
 +!atacar: true
@@ -34,18 +36,18 @@
 		irLinhaReta(X,Y);
 		!atacar.
 	   
-
-	
 //Resgate a posicao da bola (percepcao) e rotacione olhando pra bola
 +!olheBola : true
 	<- 	?posBola(X,Y);
 		rotacioneParaBola(X,Y).
 		
-		
+//decide melhor ponto do gol para chutar utilizando Fuzzy.
 +!melhorPosChute : true
 	<- posicaoChute.
 	
-		
++!estrategiaAtaque : not com(bola) & not perto(gol)
+	<-	!!olhaBola;	
+		posicionaAtaque.
 
 
 
