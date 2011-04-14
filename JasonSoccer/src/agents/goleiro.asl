@@ -6,8 +6,6 @@ posicao(24, 8).
 time(team_b).
 
 
-
-
 /* Initial goal */
 
 // Objetivo inicial: entrar em campo 

@@ -6,6 +6,7 @@ import br.ufrgs.f180.api.Player;
 import br.ufrgs.f180.math.Point;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Random;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -57,8 +58,8 @@ public class SoccerEnv extends Environment {
     private static final String IR_LINHA_RETA = "irLinhaReta";
     private static final String DEFENDER_GOL = "defender";
     private static final Literal CHUTAR = Literal.parseLiteral("chutar");
-    private static final Literal CHUTE_AO_GOL = Literal.parseLiteral("chuteAoGol");
     private static final Literal POSICAO_CHUTE = Literal.parseLiteral("posicaoChute");
+    private static final Literal POSICIONA_ATAQUE = Literal.parseLiteral("posicionaAtaque");
     /*Jogadores*/
     private static final Jogador goleiro = new Jogador(0, 0);
     private static final Jogador atacanteMeio = new Jogador(0, 0);
@@ -106,7 +107,7 @@ public class SoccerEnv extends Environment {
         try {
 
 
-            logger.info(agName + " doing: " + action);
+            //logger.info(agName + " doing: " + action);
 
             if (action.getFunctor().equals(CREATE_PLAYER)) {
                 this.createPlayer(agName, action);
@@ -137,6 +138,10 @@ public class SoccerEnv extends Environment {
             if (action.equals(POSICAO_CHUTE)) {
 
                 this.melhorPosChute(agName, action);
+            }
+            if(action.equals(POSICIONA_ATAQUE))
+            {
+                this.posicionaAtaque(agName,action);
             }
 
 
@@ -201,12 +206,12 @@ public class SoccerEnv extends Environment {
         //se próximo ao gol
         if (agentGridPosition[0] >= 17) {
             addPercept(agName, PERTO_GOL);
-            clientProxy.setPlayerKick(agName, 50.0);
+
         }
 
 
         //adiciona percepcao ao jogador mais proximo da bola
-        String jogadorMaisProximoDaBola = this.verificaJogadorMaisProximoDaBola();
+        String jogadorMaisProximoDaBola = this.verificaJogadorMaisProximoDaBola(agName);
         if (agName.equals(jogadorMaisProximoDaBola)) {
             addPercept(agName, MAIS_PERTO_BOLA);
         }
@@ -308,6 +313,16 @@ public class SoccerEnv extends Environment {
 
     }
 
+    private synchronized void posicionaAtaque(String agName, Structure action) throws Exception {
+
+       int xAtaque = 17 + (int)(Math.random() * ((24 - 17) + 1));
+       int yAtaque = (int)(Math.random()*16);
+
+
+       MetodosAuxiliares.irLinhaReta(clientProxy, this.getJogadorByName(agName));
+
+    }
+
     /**
      * Método privado que retorna a instancia do jogador através do nome
      * @param name Nome do jogador
@@ -342,7 +357,7 @@ public class SoccerEnv extends Environment {
      * Método privado que verifica qual dos jogadores está mais próximo da bola
      * @return <code>String</code> contendo o nome do jogador mais próximo da bola
      */
-    private synchronized String verificaJogadorMaisProximoDaBola() {
+    private synchronized String verificaJogadorMaisProximoDaBola(String agName) {
         String nomeJogador = null;
 
         Point posBola = clientProxy.getBallInformation().getPosition();
@@ -369,6 +384,9 @@ public class SoccerEnv extends Environment {
         double distancias[] = {distGoleiro, distAtacanteM, distAtacanteD, distAtacanteE};
         Arrays.sort(distancias);
 
+        if (!(agName.equals(SoccerEnv.goleiro.getNome())) && distancias[0] == distGoleiro) {
+            distancias[0] = distancias[1];
+        }
 
 
         if (distancias[0] == distGoleiro) {
