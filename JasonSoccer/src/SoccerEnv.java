@@ -182,6 +182,10 @@ public class SoccerEnv extends Environment {
 
         //atualiza a posicao do agente
         Point agentPosition = clientProxy.getPlayerInformation(agName).getPosition();
+        double agentAngle = clientProxy.getPlayerInformation(agName).getAngle();
+        Point head = agentPosition.sum(new Point(10*Math.cos(agentAngle),10*Math.sin(agentAngle)));
+
+
         int agentGridPosition[] = FieldModel.toJasonPosition(agentPosition);
         Literal pa = ASSyntax.createLiteral("posicao",
                 ASSyntax.createNumber(agentGridPosition[0]),
@@ -191,8 +195,9 @@ public class SoccerEnv extends Environment {
         modelo.setAgPosByName(agName, agentGridPosition[0], agentGridPosition[1]);
 
         //se agente com bola
-        if (agentGridPosition[0] == ballGridPosition[0] && agentGridPosition[1] == ballGridPosition[1]) {
-
+        if(head.distanceFrom(ballPosition) < 5)
+        //if (agentGridPosition[0] == ballGridPosition[0] && agentGridPosition[1] == ballGridPosition[1]) {
+        {
             addPercept(agName, COM_BOLA);
         }
 
