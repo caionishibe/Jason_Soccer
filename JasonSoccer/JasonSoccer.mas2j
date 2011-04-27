@@ -7,8 +7,11 @@ MAS jasonSoccer {
     environment: SoccerEnv
     agents:
 
-		goleiro 
-			/src/agents/goleiro.asl;
+		goleiroTeamA 
+			/src/agents/gTeamA.asl;
+		
+		goleiroTeamB
+			/src/agents/gTeamB.asl;
 		
 		atacanteMeio 
 			/src/agents/aMeio.asl;

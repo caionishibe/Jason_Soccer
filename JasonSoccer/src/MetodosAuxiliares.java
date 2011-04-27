@@ -11,9 +11,6 @@ import br.ufrgs.f180.math.Point;
 public class MetodosAuxiliares {
 
     /*constantes dos controladores*/
-    /**
-     * KP - CAIO
-     */
     private static final double KP_ROTACIONAR = 0.12;
     /**
      * Intervalo de tempo
@@ -78,7 +75,7 @@ public class MetodosAuxiliares {
         double totalAvirar = Math.abs(totalAvirarAntiHorario) < Math.abs(totalAvirarHorario) ? totalAvirarAntiHorario : totalAvirarHorario;
 
         if (Math.abs(totalAvirar) >= 0.05) {
-            cliente.setPlayerRotationVelocity(id, totalAvirar * (KP_ROTACIONAR/3));
+            cliente.setPlayerRotationVelocity(id, totalAvirar * (KP_ROTACIONAR/5));
             atual = p1.getAngle();
         } else {
             cliente.setPlayerRotationVelocity(id, 0.0);

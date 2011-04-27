@@ -1,12 +1,13 @@
-//Atacante central
+//Goleiro team_a
 
 /* Initial beliefs and rules */
 
-posicaoIni(240, 200).
+posicaoIni(40, 200).
 time(team_a).
-meuNome(atacanteMeio).
+meuNome(goleiroTeamA).
+
 
 //Inclui os comportamentos de um atacante
-{ include("atacante.asl") }
+{ include("goleiro.asl") }
 
 
