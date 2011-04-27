@@ -158,22 +158,23 @@ As linhas de código a seguir mostram as implementações de crenças iniciais para 
 
 \begin{quadro}[!h] 
 \begin{verbatim}
-// Agente: Atacante (atacante.asl)
+//Atacante central (aMeio.asl)
 
 /* Initial beliefs and rules */
-posicao(5, 8).
+posicaoIni(240, 200).
 time(team_a).
-
+meuNome(atacanteMeio).
 /* Initial goals */
 // Objetivo inicial: entrar em campo
 !entrarEmCampo.
 
-// Agente: Goleiro (goleiro.asl)
+
+//Goleiro team_a (gTeamA.asl)
 
 /* Initial beliefs and rules */
-posicaoInicial(24, 8).
-time(team_b).
-
+posicaoIni(40, 200).
+time(team_a).
+meuNome(goleiroTeamA).
 /* Initial goal */
 // Objetivo inicial: entrar em campo 
 !entrarEmCampo.
@@ -220,9 +221,11 @@ O goleiro não poderá sair de sua área em frente ao gol, com exceção de um pequen
 
 \chapter{Planos}
 
-Esta seção corresponde a fase dois da implementação de agentes no futebol de robôs. Serão definidos, em Jason, os planos de ação dos atacantes e do goleiro.
+Esta seção corresponde a fase dois da implementação de agentes no futebol de robôs. Serão definidos, em Jason, os planos de ação dos atacantes e do goleiro, tanto para ataque quanto para defesa.
 
-\section{Atacantes}
+\section{Planos de ataque}
+
+\subsection{Atacantes}
 
 \begin{quadro}[!h] 
 \begin{verbatim}
@@ -298,7 +301,7 @@ O oitavo plano define que, sempre que \texttt{olheBola} entrar na base de objeti
 
 O nono plano define que, sempre que \texttt{olharCompanheiro} entrar na base de objetivos do agente, este rotacionará em direção a posição do agente mais próximo.
 
-\section{Goleiro}
+\subsection{Goleiro}
 
 \begin{quadro}[!h] 
 \begin{verbatim}
@@ -341,6 +344,36 @@ O terceiro plano, funciona como plano \textit{default}. Sempre que o agente não 
 
 O quarto e último plano define que, sempre que \texttt{olheBola} entrar na base de objetivos do agente, a posição da bola é resgatada da sua base de crenças e este posiciona sua frente na direção da mesma.
 
+\section{Planos de defesa}
+
+O primeiro plano leva em consideração três percepções. Se o agente não está com a bola e quem está perto da bola é do time adversário, então tente roubar a bola.
+
+O segundo plano leva em consideração duas percepções. Se o agente que está com a bola é do time adversário, então vá para posição de defesa.
+
+O terceiro plano leva em consideração três percepções. Se existe algum jogador adversário no campo do agente, e este não está com a bola, então adote posição de marcação.
+
+\begin{quadro}[!h] 
+\begin{verbatim}
+// caso o jogador que esteja mais proximo da bola seja um jogador do time
+adversario
++!defender: maisPertoBola(A) & not companheiro(A) & not comBola(A)
+	<- roubaBola;
+!defender.
+
+//caso o jogador que esteja com a bola seja um jogador do time adversario
++!defender: comBola(A) & not companheiro(A)		
+	<- defesa;
+	!defender.
+		
+//caso exista jogador do time adversario no meu campo 
++!defender: noMeuCampo(A) & not companheiro(A) & not comBola(A)
+	<-marcar;
+	!defender.
+\end{verbatim}
+\caption{Código dos planos de defesa, em Jason}
+\label{cod-planos-defesa}
+\end{quadro}
+
 \chapter{Tewnta e Jason}
 
 Para a modelagem das crenças iniciais assim como das possíveis ações de cada agente, foi adotada a linguagem Jason, baseada em AgentSpeak. Para colocar em prática a modelagem em questão, foi usado o simulador Tewnta.
@@ -351,13 +384,17 @@ Inicialmente, deve-se criar um arquivo em Jason (extensão .mas2j) que define o a
 
 \begin{quadro}[!h] 
 \begin{verbatim}
+/* Jason Project */
 MAS jasonSoccer {
     infrastructure: Centralised
     environment: SoccerEnv
     agents:
 
-		goleiro 
-			/src/agents/goleiro.asl;
+		goleiroTeamA 
+			/src/agents/gTeamA.asl;
+		
+		goleiroTeamB
+			/src/agents/gTeamB.asl;
 		
 		atacanteMeio 
 			/src/agents/aMeio.asl;
@@ -404,6 +441,8 @@ Para a elaboração deste projeto, o simulador Tewnta passou por alterações no sen
 Através da realização desta tarefa, foi possível testar de maneira prática a implementação de um agente que segue o modelo BDI para atingir um objetivo. Durante esta primeira fase, foram modeladas as crenças iniciais dos agentes, assim como suas possíveis ações dentro do ambiente definido. A comunicação do ambiente Jason, que permite escrever sentenças com a linguagem AgentSpeak, foi posta em prática com o simulador Tewnta. Com esta base definida, pode-se partir para fases futuras que incluem a implementação dos comportamentos definidos para os agentes modelados.
 
 Durante a fase de implementação dos planos dos agentes, optou-se pela remoção do grid de campo. Dessa forma, os agentes podem estar em qualquer coordenada (x,y) do campo do Tewnta, assim como podem mover-se livremente em qualquer direção.
+
+Para a fase de definição dos planos de defesa, houve a necessidade do acréscimo de mais uma crença inicial: nome do agente. É interessante que todos os jogadores tenham ciência de quem está próximo da bola, de quem é parte integrante do seu time e de quem está com a bola. Logo, para verificar se um determinado agente está com a bola, é necessário comparar o nome de quem está com a bola e o nome do agente (comBola(A) \& meuNome(A)). Para checar se o jogador que está com a bola é do time do agente é necessário comparar o nome dos companheiros com o nome do agente que está com a bola (comBola(A) \& companheiro(A)). Ou ainda para validar se o agente está próximo da bola é preciso garantir que o nome do agente próximo da bola é igual ao nome do agente (maisPertoBola(A) \& meuNome(A)).
 
 % referencias: livro helder, site jason, site tewnta, livro agentspeak
 
